@@ -28,6 +28,25 @@
     <view class="btn" bindtap="addManual">手动标注</view>
   </view>
 
+  <view class="card story" wx:if="{{story}}">
+    <view class="st-head">
+      <text class="hero">{{story.hero}}</text>
+      <view><view class="serif st-title">{{story.title}}</view><view class="lw-en">{{story.title_en}}</view></view>
+    </view>
+    <view wx:for="{{story.view}}" wx:for-item="line" wx:for-index="li" wx:key="li" class="sl {{li === reading ? 'reading' : ''}}" style="animation-delay: {{0.15 + li * 0.35}}s">
+      <view class="zh serif"><block wx:for="{{line.segs}}" wx:for-item="g" wx:key="index"><text wx:if="{{g.w === undefined}}">{{g.t}}</text><view wx:else class="sw-word" data-zh="{{g.t}}" catchtap="tapStoryWord"><view class="rt">{{g.py}}</view><view>{{g.t}}{{g.emoji}}</view></view></block></view>
+      <view class="lw-en" wx:if="{{showEn}}">{{line.en}}</view>
+    </view>
+    <view class="row">
+      <view class="btn primary sm" bindtap="readStory">读故事</view>
+      <view class="btn sm" data-lang="en" bindtap="readStory">Read in English</view>
+      <view class="btn sm" bindtap="toggleEn">{{showEn ? '隐藏英文' : '显示英文'}}</view>
+      <view class="btn sm" bindtap="newStory">换一个</view>
+    </view>
+    <view class="hint">{{story.source === 'ai' ? 'AI 现编' : '离线模板'}} · 点故事里的词可以学它</view>
+  </view>
+  <view class="card" wx:elif="{{storyLoading}}"><text class="hint">✏️ 正在用照片里的东西编故事…</text></view>
+
   <view class="card learn" wx:if="{{cur}}">
     <view class="row" style="justify-content: space-between">
       <view><view class="lw-py">{{cur.pinyin}}</view><view class="lw-en">{{cur.en}}</view></view>

@@ -145,6 +145,26 @@ textarea { resize: vertical; font: 12.5px/1.6 ui-monospace, "SF Mono", Menlo, mo
 .objlist button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
 .manual { display: flex; gap: 6px }
 
+/* 小故事 */
+.story { margin-top: 16px; padding: 20px 22px; display: grid; gap: 14px }
+.st-head { display: flex; gap: 14px; align-items: center }
+.st-head h3 { margin: 0; font: 600 20px/1.3 var(--f-display) }
+.st-en-title { margin: 2px 0 0; color: var(--muted); font: italic 13.5px var(--f-latin) }
+.hero { font-size: 40px; line-height: 1; display: inline-block }
+.bob { animation: bob 2.4s ease-in-out infinite }
+@keyframes bob { 50% { transform: translateY(-6px) rotate(-4deg) } }
+.st-lines { display: grid; gap: 10px }
+.sl { opacity: 0; transform: translateY(8px); animation: rise .5s ease forwards; border-left: 3px solid transparent; padding-left: 12px; border-radius: 0 6px 6px 0; transition: border-color .2s, background .2s }
+.sl.reading { border-left-color: var(--cinnabar); background: color-mix(in srgb, var(--cinnabar) 7%, transparent) }
+@keyframes rise { to { opacity: 1; transform: none } }
+.sl .zh { margin: 0; font: 19px/2.2 var(--f-display) }
+.sl .en { margin: 0; color: var(--muted); font: italic 13.5px/1.5 var(--f-latin) }
+.sw-word { border: 0; background: var(--accent-soft); color: var(--accent); border-radius: 6px; padding: 0 4px; margin: 0 2px; font: 600 1em/1.4 var(--f-display); display: inline-flex; align-items: baseline; gap: 2px }
+.sw-word rt { font: 11px var(--f-latin); color: var(--muted) }
+.sw-emoji { font-size: .85em }
+.sl.reading .sw-word { animation: pulse .6s ease 2 }
+@keyframes pulse { 50% { transform: scale(1.12) } }
+
 /* ---------- 复习 ---------- */
 .rv { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start }
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px }
@@ -193,7 +213,7 @@ dialog h2 { margin: 0; font: 600 20px var(--f-display) }
   .toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)) }
   .tzg .fallback { font-size: 64px }
 }
-@media (prefers-reduced-motion: reduce) { .scan { animation: none; display: none } .tag { animation: none; opacity: 1; transform: translate(-50%, -60%) } }
+@media (prefers-reduced-motion: reduce) { .bob, .sl.reading .sw-word { animation: none } .sl { animation: none; opacity: 1; transform: none } .scan { animation: none; display: none } .tag { animation: none; opacity: 1; transform: translate(-50%, -60%) } }
 </style>
 </head>
 <body>
@@ -331,6 +351,7 @@ dialog h2 { margin: 0; font: 600 20px var(--f-display) }
             <input type="text" id="manualInput" placeholder="没认出来？点照片上的位置，再输入词语，比如：鸡蛋" style="max-width: 360px">
             <button class="btn" type="submit">手动标注</button>
           </form>
+          <section class="panel story" id="story" aria-live="polite" hidden></section>
         </div>
         <aside class="panel learn" id="learn">
           <div class="empty">点照片上的标签，开始学这个词。</div>
@@ -380,6 +401,7 @@ dialog h2 { margin: 0; font: 600 20px var(--f-display) }
 <script src="core/ai.js"></script>
 <script src="core/srs.js"></script>
 <script src="core/demo.js"></script>
+<script src="core/story.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

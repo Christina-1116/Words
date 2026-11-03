@@ -3,6 +3,7 @@ const P = require('../../utils/core/planner.js');
 const AI = require('../../utils/core/ai.js');
 const S = require('../../utils/core/srs.js');
 const Demo = require('../../utils/core/demo.js');
+const St = require('../../utils/core/story.js');
 const ai = require('../../utils/ai-client.js');
 const store = require('../../utils/store.js');
 const speak = require('../../utils/tts.js');
@@ -11,7 +12,7 @@ const { pinyin } = require('../../utils/pinyin-pro.js');
 const fs = wx.getFileSystemManager();
 
 Page({
-  data: { photo: '', aspect: '4 / 3', objects: [], sel: -1, cur: null, curChars: [], scanning: false, status: '', aiOk: false, manual: '', writing: false },
+  data: { photo: '', aspect: '4 / 3', objects: [], sel: -1, cur: null, curChars: [], scanning: false, status: '', aiOk: false, manual: '', writing: false, story: null, storyLoading: false, showEn: false, reading: -1 },
   onShow() { this.setData({ aiOk: ai.available() }); },
   onReady() {
     wx.createSelectorQuery().select('#work').fields({ node: true }).exec(r => { this.work = r[0].node; });
@@ -30,7 +31,7 @@ Page({
   usePhoto(path) {
     wx.getImageInfo({ src: path, success: info => {
       this.scene = '';
-      this.setData({ photo: path, aspect: info.width + ' / ' + info.height, objects: [], sel: -1, cur: null });
+      this.resetStory(); this.setData({ photo: path, aspect: info.width + ' / ' + info.height, objects: [], sel: -1, cur: null });
       if (!ai.available()) { this.setData({ status: '未接入视觉模型：点照片位置并输入词语手动标注，或去「字族图 → 模型设置」接入。' }); return; }
       const base64 = fs.readFileSync(path, 'base64');
       this.setData({ scanning: true, status: '正在识别…' });
@@ -39,7 +40,7 @@ Page({
         const r = AI.normalizeVision(P.extractJSON(t));
         r.objects.forEach(o => { if (!o.pinyin) o.pinyin = pinyin(o.zh); });
         this.scene = r.scene;
-        this.setData({ objects: r.objects, status: (r.scene ? r.scene + '：' : '') + '找到 ' + r.objects.length + ' 样东西，用时 ' + ((Date.now() - t0) / 1000).toFixed(1) + ' 秒' });
+        this.setData({ objects: r.objects, status: (r.scene ? r.scene + '：' : '') + '找到 ' + r.objects.length + ' 样东西，用时 ' + ((Date.now() - t0) / 1000).toFixed(1) + ' 秒' }, () => this.makeStory());
       }).catch(e => this.setData({ status: '识别失败：' + e.message })).then(() => this.setData({ scanning: false }));
     } });
   },
@@ -48,10 +49,11 @@ Page({
     Demo.draw(c.getContext('2d'));
     wx.canvasToTempFilePath({ canvas: c, fileType: 'jpg', quality: 0.9, success: r => {
       this.scene = Demo.scene;
+      this.resetStory();
       this.setData({ photo: r.tempFilePath, aspect: '4 / 3', objects: [], sel: -1, cur: null, scanning: true, status: '正在识别…' });
       setTimeout(() => {
         const objs = Demo.objects(L);
-        this.setData({ scanning: false, objects: objs, status: '冰箱里：找到 ' + objs.length + ' 样东西（示例数据）' });
+        this.setData({ scanning: false, objects: objs, status: '冰箱里：找到 ' + objs.length + ' 样东西（示例数据）' }, () => this.makeStory());
       }, 1200);
     } });
   },
@@ -71,7 +73,7 @@ Page({
     const t = L.thing(zh) || {};
     const o = { id: 'm' + Date.now(), zh, pinyin: t.pinyin || pinyin(zh), en: t.en || '', emoji: t.emoji || '', sentence: t.sentence || '', sentence_en: '', box: this.pending || [400, 400, 600, 600] };
     this.pending = null;
-    this.setData({ objects: this.data.objects.concat([o]), manual: '' }, () => this.select({ currentTarget: { dataset: { i: this.data.objects.length - 1 } } }));
+    this.setData({ objects: this.data.objects.concat([o]), manual: '' }, () => { this.select({ currentTarget: { dataset: { i: this.data.objects.length - 1 } } }); this.makeStory(); });
   },
 
   select(e) {
@@ -135,5 +137,46 @@ Page({
     this.data.objects.reduce((p, o) => p.then(() => this.addToDeck(o)), Promise.resolve())
       .then(() => wx.showToast({ title: '已加入 ' + this.data.objects.length + ' 个词' }));
   },
-  onHide() { (this.anims || []).forEach(a => a.stop()); }
+  // ---------- 拍照小故事：识别完自动生成 ----------
+  resetStory() { this.storyRun = (this.storyRun || 0) + 1; speak.stop(); this.story = null; this.setData({ story: null, storyLoading: false, reading: -1 }); },
+  makeStory(again) {
+    const objs = this.data.objects; if (!objs.length) return;
+    if (again) this.storySeed = (this.storySeed || 0) + 1;
+    const run = this.storyRun = (this.storyRun || 0) + 1;
+    const show = st => { if (run === this.storyRun) this.showStory(St.ensureWords(st)); };
+    const fallback = () => show(St.offline(objs, this.scene, this.storySeed || 0));
+    if (!ai.available()) return fallback();
+    this.setData({ storyLoading: true, story: null });
+    const m = St.storyMessages(objs, this.scene);
+    ai.call(m).then(t => { const st = St.normalize(P.extractJSON(t), m.words); if (!st.lines.length) throw new Error('empty'); show(st); })
+      .catch(fallback).then(() => this.setData({ storyLoading: false }));
+  },
+  showStory(st) {
+    st.view = st.lines.map(l => ({
+      en: l.en,
+      segs: St.segments(l.zh, st.words).map(g => g.w === undefined ? { t: g.t } : { t: g.t, w: g.w, py: st.words[g.w].pinyin, emoji: st.words[g.w].emoji || '' })
+    }));
+    this.story = st;
+    this.setData({ story: st, reading: -1 });
+  },
+  readStory(e) {
+    const st = this.story; if (!st) return;
+    const en = e.currentTarget.dataset.lang === 'en';
+    if (en) this.setData({ showEn: true });
+    let i = 0;
+    const next = () => {
+      if (i >= st.lines.length) { this.setData({ reading: -1 }); return; }
+      this.setData({ reading: i });
+      const l = st.lines[i++];
+      speak(en ? l.en : l.zh, en ? 'en' : 'zh', () => setTimeout(next, 250));
+    };
+    next();
+  },
+  toggleEn() { this.setData({ showEn: !this.data.showEn }); },
+  newStory() { this.makeStory(true); },
+  tapStoryWord(e) {
+    const zh = e.currentTarget.dataset.zh, i = this.data.objects.findIndex(o => o.zh === zh);
+    if (i >= 0) this.select({ currentTarget: { dataset: { i } } });
+  },
+  onHide() { (this.anims || []).forEach(a => a.stop()); speak.stop(); }
 });

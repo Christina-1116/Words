@@ -1,7 +1,7 @@
 /* 识字工坊 Web Demo —— 字族图 / 拍照识字 / 复习 */
 (function () {
   'use strict';
-  var L = window.HZLexicon, P = window.HZPlanner, R = window.HZRender, AI = window.HZAI, S = window.HZSRS;
+  var St = window.HZStory, L = window.HZLexicon, P = window.HZPlanner, R = window.HZRender, AI = window.HZAI, S = window.HZSRS;
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
@@ -254,7 +254,7 @@
 
   function setPhoto(url) {
     return new Promise(function (resolve) {
-      snap.url = url; snap.objects = []; snap.sel = -1;
+      snap.url = url; snap.objects = []; snap.sel = -1; snap.story = null; storyRun++; $('#story').hidden = true;
       photo.innerHTML = '<img alt="拍的照片"><div class="layer" id="layer"></div>';
       var img = photo.querySelector('img');
       img.onload = function () { snap.img = img; photo.style.aspectRatio = img.naturalWidth + ' / ' + img.naturalHeight; resolve(); };
@@ -305,12 +305,73 @@
     store.set('deck', deck);
   }
 
-  function speak(text, lang) {
-    if (!('speechSynthesis' in window)) { toast('这个浏览器不支持朗读'); return; }
+  function speak(text, lang, onEnd) {
+    if (!('speechSynthesis' in window)) { toast('这个浏览器不支持朗读'); if (onEnd) onEnd(); return; }
     speechSynthesis.cancel();
     var u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = lang.indexOf('zh') === 0 ? 0.8 : 0.9;
+    if (onEnd) { var done = false; u.onend = u.onerror = function () { if (!done) { done = true; onEnd(); } }; }
     speechSynthesis.speak(u);
   }
+
+  /* ---------- 拍照小故事：识别完自动生成 ---------- */
+  var storySeed = 0, storyRun = 0;
+  function makeStory(again) {
+    if (!snap.objects.length) return;
+    var box = $('#story'); box.hidden = false;
+    if (again) storySeed++;
+    var run = ++storyRun;
+    var fallback = function () { if (run === storyRun) renderStory(St.ensureWords(St.offline(snap.objects, snap.scene, storySeed))); };
+    if (!settings.key) { fallback(); return; }
+    box.innerHTML = '<div class="st-head"><span class="hero bob" aria-hidden="true">✏️</span><div><h3>正在用照片里的东西编故事…</h3></div></div>';
+    var m = St.storyMessages(snap.objects, snap.scene);
+    callAI(m).then(function (txt) {
+      var st = St.normalize(P.extractJSON(txt), m.words);
+      if (!st.lines.length) throw new Error('empty');
+      if (run === storyRun) renderStory(St.ensureWords(st));
+    }).catch(fallback);
+  }
+  function renderStory(story) {
+    snap.story = story;
+    var box = $('#story'), showEn = box.dataset.en === '1';
+    box.innerHTML =
+      '<div class="st-head"><span class="hero bob" aria-hidden="true">' + esc(story.hero) + '</span><div><h3>' + esc(story.title) + '</h3><p class="st-en-title">' + esc(story.title_en) + '</p></div></div>' +
+      '<div class="st-lines">' + story.lines.map(function (l, i) {
+        return '<div class="sl" style="animation-delay:' + (0.15 + i * 0.35) + 's"><p class="zh">' +
+          St.segments(l.zh, story.words).map(function (g) {
+            if (g.w == null) return esc(g.t);
+            var w = story.words[g.w];
+            return '<button type="button" class="sw-word" data-zh="' + esc(w.zh) + '"><ruby>' + esc(w.zh) + '<rt>' + esc(w.pinyin) + '</rt></ruby>' + (w.emoji ? '<span class="sw-emoji" aria-hidden="true">' + esc(w.emoji) + '</span>' : '') + '</button>';
+          }).join('') + '</p><p class="en"' + (showEn ? '' : ' hidden') + '>' + esc(l.en) + '</p></div>';
+      }).join('') + '</div>' +
+      '<div class="row"><button class="btn primary sm" type="button" id="readStory">读故事</button><button class="btn sm" type="button" id="readStoryEn">Read in English</button>' +
+      '<button class="btn sm" type="button" id="toggleEn">' + (showEn ? '隐藏英文' : '显示英文') + '</button><button class="btn sm ghost" type="button" id="newStory">换一个故事</button>' +
+      '<span class="hint">' + (story.source === 'ai' ? 'AI 现编' : '离线模板') + ' · 点故事里的词可以学它</span></div>';
+    $('#readStory').onclick = function () { readStory('zh'); };
+    $('#readStoryEn').onclick = function () { readStory('en'); };
+    $('#toggleEn').onclick = function () { setStoryEn(box.dataset.en !== '1'); };
+    $('#newStory').onclick = function () { makeStory(true); };
+  }
+  function setStoryEn(on) {
+    $('#story').dataset.en = on ? '1' : '0';
+    $$('#story .sl .en').forEach(function (el) { el.hidden = !on; });
+    $('#toggleEn').textContent = on ? '隐藏英文' : '显示英文';
+  }
+  function readStory(lang) {
+    var story = snap.story; if (!story) return;
+    if (lang === 'en') setStoryEn(true);
+    var lines = $$('#story .sl'), i = 0;
+    $$('#story .sl').forEach(function (el) { el.style.animation = 'none'; el.style.opacity = 1; el.style.transform = 'none'; });
+    (function next() {
+      lines.forEach(function (el, k) { el.classList.toggle('reading', k === i); });
+      if (i >= story.lines.length) return;
+      var l = story.lines[i++];
+      speak(lang === 'en' ? l.en : l.zh, lang === 'en' ? 'en-US' : 'zh-CN', function () { setTimeout(next, 250); });
+    })();
+  }
+  $('#story').addEventListener('click', function (e) {
+    var b = e.target.closest('.sw-word'); if (!b) return;
+    for (var i = 0; i < snap.objects.length; i++) if (snap.objects[i].zh === b.dataset.zh) { select(i); return; }
+  });
 
   function charLoader(ch, onLoad, onError) {
     fetch('hanzi-data/' + encodeURIComponent(ch) + '.json').then(function (r) { if (!r.ok) throw 0; return r.json(); })
@@ -371,7 +432,7 @@
       r.objects.forEach(function (o) { if (!o.pinyin) o.pinyin = pinyinFn(o.zh); });
       snap.objects = r.objects; snap.scene = r.scene;
       $('#snapStatus').textContent = (r.scene ? r.scene + '：' : '') + '找到 ' + r.objects.length + ' 样东西，用时 ' + ((performance.now() - t0) / 1000).toFixed(1) + ' 秒';
-      placeTags();
+      placeTags(); makeStory();
       $('#learn').innerHTML = '<div class="empty">点一个标签，开始学这个词。</div>';
     }).catch(function (e) {
       $('#snapStatus').textContent = '识别失败：' + e.message + '。可以点照片手动标注。';
@@ -399,7 +460,7 @@
     var t = L.thing(zh) || {};
     snap.objects.push({ id: 'm' + Date.now(), zh: zh, pinyin: t.pinyin || pinyinFn(zh), en: t.en || '', emoji: t.emoji || '', sentence: t.sentence || '', sentence_en: '', box: snap.pending || [400, 400, 600, 600] });
     snap.pending = null; $('#manualInput').value = '';
-    placeTags(); select(snap.objects.length - 1);
+    placeTags(); select(snap.objects.length - 1); makeStory();
   });
 
   // 示例冰箱（插画，坐标已知，不需要 Key）
@@ -415,7 +476,7 @@
       setTimeout(function () {
         scanning(false); snap.objects = d.objects; snap.scene = '冰箱里';
         $('#snapStatus').textContent = '冰箱里：找到 ' + d.objects.length + ' 样东西（示例数据）';
-        placeTags(); $('#learn').innerHTML = '<div class="empty">点一个标签，开始学这个词。</div>';
+        placeTags(); makeStory(); $('#learn').innerHTML = '<div class="empty">点一个标签，开始学这个词。</div>';
       }, 1300);
     });
   }
