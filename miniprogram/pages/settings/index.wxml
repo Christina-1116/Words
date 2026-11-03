@@ -1,0 +1,18 @@
+<view class="wrap">
+  <view class="h1 serif">模型设置</view>
+  <view class="lead">内置词库和示例照片不需要模型。策划任意汉字、识别真实照片需要接入大模型（拍照需支持图片）。</view>
+  <view class="card">
+    <view class="label">调用方式</view>
+    <view class="seg"><view class="{{s.mode === 'cloud' ? 'on' : ''}}" data-v="cloud" bindtap="setMode">云函数代理（推荐）</view><view class="{{s.mode === 'direct' ? 'on' : ''}}" data-v="direct" bindtap="setMode">直连</view></view>
+    <view class="hint" style="margin-top: 12rpx" wx:if="{{s.mode === 'cloud'}}">Key 配在云函数 aiProxy 的环境变量里，不进小程序包。上线必须用这种方式。</view>
+    <block wx:else>
+      <view class="hint" style="margin-top: 12rpx">仅用于开发调试。需在小程序后台把接口域名加入 request 合法域名。</view>
+      <view class="label" style="margin-top: 20rpx">服务商</view>
+      <picker range="{{presetNames}}" value="{{presetIndex}}" bindchange="setPreset"><view class="btn">{{presetNames[presetIndex]}}</view></picker>
+      <view class="label" style="margin-top: 20rpx">接口地址</view><input value="{{s.base}}" data-k="base" bindinput="edit" />
+      <view class="label" style="margin-top: 20rpx">模型</view><input value="{{s.model}}" data-k="model" bindinput="edit" />
+      <view class="label" style="margin-top: 20rpx">API Key</view><input password value="{{s.key}}" data-k="key" bindinput="edit" />
+    </block>
+    <view class="btn primary" style="margin-top: 28rpx" bindtap="save">保存</view>
+  </view>
+</view>

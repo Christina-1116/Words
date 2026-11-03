@@ -1,0 +1,22 @@
+.photo { position: relative; margin-top: 24rpx; border-radius: 20rpx; overflow: hidden; background: var(--sunk); }
+.img { width: 100%; height: 100%; display: block; }
+.empty { display: flex; flex-direction: column; align-items: center; gap: 10rpx; padding: 80rpx 20rpx; }
+.scan { position: absolute; left: 0; right: 0; height: 30%; top: -30%; background: linear-gradient(to bottom, transparent, rgba(46,106,88,.35)); border-bottom: 4rpx solid var(--accent); animation: scan 1.4s ease-in-out infinite; }
+@keyframes scan { to { top: 100%; } }
+.obj { position: absolute; border-radius: 16rpx; border: 3rpx dashed transparent; }
+.obj.on { border-color: rgba(255,255,255,.95); background: rgba(255,255,255,.14); }
+.tag { position: absolute; left: 50%; top: 0; transform: translate(-50%, -60%) scale(.6); opacity: 0; background: rgba(255,255,255,.96); border-radius: 18rpx; padding: 6rpx 16rpx 8rpx; text-align: center; white-space: nowrap; box-shadow: 0 12rpx 30rpx -10rpx rgba(0,0,0,.35); animation: pop .45s cubic-bezier(.2,1.4,.4,1) forwards; }
+.obj.on .tag { background: var(--accent); color: #fff; }
+.tag .zh { font-size: 30rpx; font-weight: 600; line-height: 1.15; }
+.tag .py { font-size: 20rpx; color: #3E5A50; }
+.obj.on .tag .py { color: #DCEAE3; }
+@keyframes pop { to { transform: translate(-50%, -60%) scale(1); opacity: 1; } }
+.learn { display: flex; flex-direction: column; gap: 22rpx; }
+.lw-py { font-size: 40rpx; color: var(--accent); font-family: Georgia, serif; }
+.lw-en { font-style: italic; color: var(--muted); font-family: Georgia, serif; }
+.grids { display: flex; gap: 16rpx; }
+.tzg { width: 200rpx; height: 200rpx; border: 2rpx solid var(--cinnabar); position: relative;
+  background: linear-gradient(var(--cinnabar), var(--cinnabar)) center / 100% 1rpx no-repeat, linear-gradient(var(--cinnabar), var(--cinnabar)) center / 1rpx 100% no-repeat; }
+.wc { width: 100%; height: 100%; position: relative; z-index: 1; }
+.sent { font-size: 34rpx; }
+.offstage { position: fixed; left: -9999px; top: 0; width: 1200px; height: 900px; }

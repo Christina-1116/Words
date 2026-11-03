@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>识字工坊</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;900&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: 左侧窄导航 + 工作台（控制栏 | 画布 | 详情），手机端堆叠为单列，底部标签栏 */
+:root {
+  --bg: #F3F4F1; --panel: #FFFFFF; --sunk: #E9EBE6; --ink: #1D2622; --muted: #66706B; --line: #D9DDD6;
+  --accent: #2E6A58; --accent-ink: #FFFFFF; --accent-soft: #DCEAE3; --cinnabar: #B5432F;
+  --ok: #2E7D4F; --warn: #A86A12; --bad: #B5432F;
+  --f-display: "Noto Serif SC", "Songti SC", "STSong", serif;
+  --f-body: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --f-latin: "Noto Serif", Georgia, serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121614; --panel: #1A201D; --sunk: #232A27; --ink: #E7ECE8; --muted: #93A099; --line: #2F3833;
+  --accent: #7CC2A8; --accent-ink: #0E1512; --accent-soft: #23362F; --cinnabar: #E07B66; --ok: #6CC795; --warn: #E0A84A; --bad: #E07B66; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121614; --panel: #1A201D; --sunk: #232A27; --ink: #E7ECE8; --muted: #93A099; --line: #2F3833;
+  --accent: #7CC2A8; --accent-ink: #0E1512; --accent-soft: #23362F; --cinnabar: #E07B66; --ok: #6CC795; --warn: #E0A84A; --bad: #E07B66; color-scheme: dark }
+
+* { box-sizing: border-box }
+html, body { height: 100% }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.55 var(--f-body); }
+button, input, select, textarea { font: inherit; color: inherit }
+button { cursor: pointer }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+
+.app { display: grid; grid-template-columns: 76px minmax(0, 1fr); min-height: 100% }
+nav.rail { background: var(--panel); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 6px; padding-block: 18px; position: sticky; top: 0; height: 100vh }
+.logo { font: 900 26px/1 var(--f-display); color: var(--accent); width: 44px; height: 44px; display: grid; place-items: center; border: 1.5px solid var(--accent); border-radius: 8px; margin-bottom: 14px }
+.rail button { width: 60px; border: 0; background: none; border-radius: 10px; padding: 8px 0; display: grid; justify-items: center; gap: 2px; color: var(--muted); font-size: 12px }
+.rail button .g { font: 600 20px/1 var(--f-display) }
+.rail button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent) }
+.rail .spacer { flex: 1 }
+
+main { min-width: 0; padding-block: 22px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.view { max-width: 1320px; margin: 0 auto }
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px }
+.head h1 { font: 600 26px/1.2 var(--f-display); margin: 0; text-wrap: balance }
+.head p { margin: 4px 0 0; color: var(--muted); max-width: 62ch }
+
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r) }
+.label { font-size: 12px; color: var(--muted); letter-spacing: .04em; margin-bottom: 6px; display: block }
+.btn { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap }
+.btn:hover { border-color: var(--accent) }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600 }
+.btn.ghost { background: none }
+.btn.sm { padding: 5px 10px; font-size: 13px }
+.btn:disabled { opacity: .5; cursor: not-allowed }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+input[type=text], input[type=password], select, textarea { width: 100%; border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 8px 10px }
+textarea { resize: vertical; font: 12.5px/1.6 ui-monospace, "SF Mono", Menlo, monospace }
+.seg { display: inline-flex; background: var(--sunk); border-radius: 8px; padding: 3px; gap: 2px }
+.seg button { border: 0; background: none; padding: 5px 10px; border-radius: 6px; font-size: 13px; color: var(--muted) }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08) }
+.hint { font-size: 12.5px; color: var(--muted) }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 99px; font-size: 13px; z-index: 50; opacity: 0; transition: opacity .2s; pointer-events: none }
+.toast.on { opacity: 1 }
+
+/* ---------- 字族图 ---------- */
+.fam { display: grid; grid-template-columns: 268px minmax(0, 1fr) 380px; gap: 16px; align-items: start }
+.ctrl { padding: 16px; display: grid; gap: 18px; position: sticky; top: 16px }
+.big-input { display: flex; gap: 8px }
+.big-input input { font: 600 30px/1 var(--f-display); text-align: center; width: 76px; padding: 10px 0 }
+.chips { display: flex; flex-wrap: wrap; gap: 6px }
+.chip { border: 1px solid var(--line); background: none; border-radius: 6px; width: 34px; height: 34px; font: 600 17px/1 var(--f-display) }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px }
+.sw { border: 1px solid var(--line); border-radius: 8px; padding: 6px 0 5px; background: none; display: grid; justify-items: center; gap: 4px; font-size: 12px }
+.sw i { width: 26px; height: 26px; border-radius: 50%; display: block; border: 1px solid rgba(0,0,0,.08) }
+.sw[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent) }
+.stage-wrap { padding: 18px; display: grid; justify-items: center; gap: 12px; background: var(--sunk); border-radius: var(--r) }
+#poster { width: 100%; height: auto; max-width: 100%; border-radius: 4px; box-shadow: 0 18px 50px -20px rgba(0,0,0,.35); background: var(--panel) }
+.stage-wrap .meta { width: 100%; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center }
+.src { font-size: 12px; padding: 3px 8px; border-radius: 99px; background: var(--panel); color: var(--muted) }
+.detail { min-width: 0 }
+.tabs { display: flex; border-bottom: 1px solid var(--line); padding: 0 8px }
+.tabs button { border: 0; background: none; padding: 12px 12px 10px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600 }
+.tabpane { padding: 14px 16px 18px }
+.words { display: grid; gap: 6px }
+.wrow { display: grid; grid-template-columns: 64px 70px minmax(0, 1fr) 48px; gap: 6px; align-items: center }
+.wrow > *, .wrow .sub > * { min-width: 0 }
+.wrow input, .wrow select { padding: 5px 6px; font-size: 13px }
+.wrow .w { font: 600 15px var(--f-display) }
+.wrow .em { text-align: center; padding: 4px 0 }
+.wrow .sub { grid-column: 2 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px }
+.catdot { width: 34px; font-size: 11px; text-align: center; border-radius: 4px; padding: 3px 0; background: var(--sunk); color: var(--muted) }
+.catdot.C { background: var(--accent-soft); color: var(--accent) }
+.qc-auto { display: grid; gap: 4px; margin-bottom: 14px }
+.qc-auto div { font-size: 13px; padding: 6px 10px; border-radius: 6px; background: var(--sunk); display: flex; gap: 8px }
+.qc-auto .ok b { color: var(--ok) } .qc-auto .warn b { color: var(--warn) } .qc-auto .error b { color: var(--bad) }
+.check { border-top: 1px solid var(--line); padding: 10px 0; display: grid; gap: 6px }
+.check .t { display: flex; justify-content: space-between; gap: 8px; align-items: center }
+.check h4 { margin: 0; font-size: 14px }
+.check p { margin: 0; color: var(--muted); font-size: 12.5px }
+.check .fix { background: var(--sunk); border-radius: 8px; padding: 10px; font-size: 12.5px; display: grid; gap: 6px }
+.check[data-s="pass"] h4::before { content: "✓ "; color: var(--ok) }
+.check[data-s="fail"] h4::before { content: "✗ "; color: var(--bad) }
+
+/* ---------- 拍照识字 ---------- */
+.snap { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 16px; align-items: start }
+.photo { container-type: inline-size; position: relative; border-radius: var(--r); overflow: hidden; background: var(--sunk); aspect-ratio: 4 / 3; max-width: 100%; display: grid; place-items: center }
+.photo img { width: 100%; height: 100%; object-fit: contain; display: block }
+.photo .empty { text-align: center; color: var(--muted); padding: 24px; display: grid; gap: 12px; justify-items: center }
+.photo .empty .big { font: 600 22px var(--f-display); color: var(--ink) }
+.layer { position: absolute; inset: 0; pointer-events: none }
+.scan { position: absolute; left: 0; right: 0; height: 30%; top: -30%; background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--accent) 35%, transparent)); border-bottom: 2px solid var(--accent); animation: scan 1.4s ease-in-out infinite; }
+@keyframes scan { to { top: 100% } }
+.obj { position: absolute; pointer-events: auto; border-radius: 10px; border: 1.5px dashed rgba(255,255,255,.0); transition: border-color .2s, background .2s }
+.obj:hover, .obj.on { border-color: rgba(255,255,255,.95); background: rgba(255,255,255,.12) }
+.tag { position: absolute; left: 50%; top: 0; transform: translate(-50%, -60%) scale(.6); opacity: 0; background: rgba(255,255,255,.96); color: #1D2622; border-radius: 12px; padding: 6px 12px 7px; text-align: center; box-shadow: 0 8px 22px -6px rgba(0,0,0,.35); border: 0; white-space: nowrap; animation: pop .45s cubic-bezier(.2,1.4,.4,1) forwards }
+.tag { padding: .3em .65em .35em; font-size: clamp(11px, 1.9cqw, 16px) }
+.tag .zh { font: 600 1.4em/1.1 var(--f-display); letter-spacing: .04em }
+.tag .py { font: .78em/1.2 var(--f-latin); color: #3E5A50 }
+.obj.on .tag { background: #2E6A58; color: #fff } .obj.on .tag .py { color: #DCEAE3 }
+@keyframes pop { to { transform: translate(-50%, -60%) scale(1); opacity: 1 } }
+.snapbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px }
+.learn { padding: 18px; display: grid; gap: 14px; position: sticky; top: 16px }
+.learn .empty { color: var(--muted); font-size: 13px }
+.lw-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px }
+.lw-py { font: 22px var(--f-latin); color: var(--accent) }
+.lw-en { font: italic 15px var(--f-latin); color: var(--muted) }
+.grids { display: grid; gap: 8px }
+.tzg { width: 100%; aspect-ratio: 1; max-width: 132px; border: 1.5px solid var(--cinnabar); position: relative; background:
+  linear-gradient(var(--cinnabar), var(--cinnabar)) center / 100% 1px no-repeat,
+  linear-gradient(var(--cinnabar), var(--cinnabar)) center / 1px 100% no-repeat; background-color: var(--panel) }
+.tzg::after { content: ""; position: absolute; inset: 0; opacity: .35; background:
+  linear-gradient(45deg, transparent calc(50% - .5px), var(--cinnabar) 50%, transparent calc(50% + .5px)),
+  linear-gradient(-45deg, transparent calc(50% - .5px), var(--cinnabar) 50%, transparent calc(50% + .5px)); pointer-events: none }
+.tzg > div, .tzg > svg { position: relative; z-index: 1 }
+.tzg .fallback { position: absolute; inset: 0; display: grid; place-items: center; font: 600 96px/1 var(--f-display) }
+.sentence { font: 18px/1.6 var(--f-display) } .sentence mark { background: none; color: var(--cinnabar); font-weight: 600 }
+.sentence-en { color: var(--muted); font: italic 13.5px var(--f-latin) }
+.objlist { display: flex; flex-wrap: wrap; gap: 6px }
+.objlist button { border: 1px solid var(--line); background: var(--panel); border-radius: 99px; padding: 4px 12px; font: 600 14px var(--f-display) }
+.objlist button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.manual { display: flex; gap: 6px }
+
+/* ---------- 复习 ---------- */
+.rv { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px }
+.stat { padding: 12px 14px }
+.stat b { display: block; font: 600 26px/1.1 var(--f-display); font-variant-numeric: tabular-nums }
+.stat span { font-size: 12px; color: var(--muted) }
+.stat.hot b { color: var(--cinnabar) }
+.quiz { padding: 22px; display: grid; gap: 16px; justify-items: center; text-align: center }
+.quiz .pic { width: 200px; height: 200px; border-radius: 14px; overflow: hidden; background: var(--sunk); display: grid; place-items: center; font-size: 96px }
+.quiz .pic img { width: 100%; height: 100%; object-fit: cover }
+.quiz .q { font: 600 18px var(--f-display) }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 420px }
+.opts button { border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 14px 8px; font: 600 24px var(--f-display); display: grid; gap: 2px }
+.opts button small { font: 12px var(--f-latin); color: var(--muted) }
+.opts button.right { border-color: var(--ok); background: color-mix(in srgb, var(--ok) 14%, var(--panel)) }
+.opts button.wrong { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 12%, var(--panel)) }
+.deck { padding: 6px 0 }
+.deck h3 { margin: 10px 16px 6px; font-size: 14px }
+.deck .it { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 8px 16px; border-top: 1px solid var(--line) }
+.deck .it .th { width: 40px; height: 40px; border-radius: 8px; overflow: hidden; background: var(--sunk); display: grid; place-items: center; font-size: 22px }
+.deck .it .th img { width: 100%; height: 100%; object-fit: cover }
+.deck .it b { font: 600 16px var(--f-display) }
+.deck .it small { color: var(--muted); font-size: 12px; display: block }
+.lvl { display: inline-flex; gap: 2px } .lvl i { width: 6px; height: 6px; border-radius: 50%; background: var(--line) } .lvl i.f { background: var(--accent) }
+
+/* ---------- 设置 ---------- */
+dialog { border: 1px solid var(--line); border-radius: 14px; padding: 0; width: min(520px, calc(100vw - 32px)); background: var(--panel); color: var(--ink) }
+dialog::backdrop { background: rgba(10, 16, 13, .45) }
+dialog form { padding: 20px; display: grid; gap: 14px }
+dialog h2 { margin: 0; font: 600 20px var(--f-display) }
+.ov { position: fixed; inset: 0; background: rgba(10,16,13,.7); display: grid; place-items: center; z-index: 40; padding: 24px }
+.ov img { max-height: 80vh; border-radius: 6px }
+.ov .bar { display: flex; gap: 8px; justify-content: center; margin-top: 12px; color: #fff; flex-wrap: wrap; align-items: center }
+
+@media (max-width: 1180px) { .fam { grid-template-columns: 240px minmax(0, 1fr) } .fam .detail { grid-column: 1 / -1 } }
+@media (max-width: 900px) {
+  .fam, .snap, .rv { grid-template-columns: minmax(0, 1fr) }
+  .ctrl, .learn { position: static }
+  .stats { grid-template-columns: repeat(2, 1fr) }
+}
+@media (max-width: 680px) {
+  .app { grid-template-columns: minmax(0, 1fr) }
+  nav.rail { position: fixed; top: auto; bottom: 0; left: 0; right: 0; height: auto; flex-direction: row; justify-content: space-around; padding: 6px max(16px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); border-right: 0; border-top: 1px solid var(--line); z-index: 30 }
+  .logo, .rail .spacer { display: none }
+  main { padding-bottom: 90px }
+  .toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)) }
+  .tzg .fallback { font-size: 64px }
+}
+@media (prefers-reduced-motion: reduce) { .scan { animation: none; display: none } .tag { animation: none; opacity: 1; transform: translate(-50%, -60%) } }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" role="tablist" aria-label="功能">
+    <div class="logo" aria-hidden="true">识</div>
+    <button role="tab" id="tab-family" aria-selected="true" data-view="family"><span class="g">族</span>字族图</button>
+    <button role="tab" id="tab-snap" aria-selected="false" data-view="snap"><span class="g">拍</span>拍照识字</button>
+    <button role="tab" id="tab-review" aria-selected="false" data-view="review"><span class="g">习</span>复习</button>
+    <div class="spacer"></div>
+    <button id="openSettings" type="button"><span class="g">设</span>设置</button>
+  </nav>
+
+  <main>
+    <!-- 字族图 -->
+    <section class="view" id="view-family">
+      <div class="head">
+        <div>
+          <h1>字族图生成器</h1>
+          <p>输入一个汉字，按「3 本义 + 3 生活 + 2 动作 + 1 反差」策划 9 个词，排成可直接发布的识字图，同时给出生图提示词和质检清单。</p>
+        </div>
+      </div>
+      <div class="fam">
+        <aside class="panel ctrl">
+          <div>
+            <label class="label" for="charInput">汉字</label>
+            <div class="big-input">
+              <input id="charInput" type="text" maxlength="1" value="明" aria-label="输入一个汉字">
+              <button class="btn primary" id="genBtn" type="button">生成</button>
+            </div>
+          </div>
+          <div>
+            <span class="label">内置词库（离线可用）</span>
+            <div class="chips" id="charChips"></div>
+          </div>
+          <div>
+            <span class="label">比例</span>
+            <div class="seg" id="ratioSeg">
+              <button type="button" aria-pressed="true" data-v="3:4">3:4</button>
+              <button type="button" aria-pressed="false" data-v="1:1">1:1</button>
+              <button type="button" aria-pressed="false" data-v="16:9">16:9</button>
+            </div>
+          </div>
+          <div>
+            <span class="label">画风</span>
+            <div class="swatches" id="themeSw"></div>
+          </div>
+          <div>
+            <label class="label" for="brandInput">署名水印</label>
+            <input id="brandInput" type="text" value="小鹿识字 · 每日一字" placeholder="例如 @你的账号">
+          </div>
+          <label class="row hint"><input type="checkbox" id="showCat" checked> 卡片显示词类标签</label>
+          <div>
+            <label class="label" for="batchInput">批量出图</label>
+            <div class="row" style="flex-wrap: nowrap">
+              <input id="batchInput" type="text" value="小大明人山水火日" aria-label="批量汉字">
+              <button class="btn" id="batchBtn" type="button">打包</button>
+            </div>
+            <p class="hint" style="margin: 6px 0 0">导出 ZIP：每字一张 PNG + 提示词.txt</p>
+          </div>
+        </aside>
+
+        <div class="stage-wrap">
+          <canvas id="poster" width="1080" height="1440" aria-label="字族图预览"></canvas>
+          <div class="meta">
+            <span class="src" id="srcTag">内置词库</span>
+            <div class="row">
+              <button class="btn" id="copyPromptBtn" type="button">复制提示词</button>
+              <button class="btn primary" id="exportBtn" type="button">导出 PNG</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel detail">
+          <div class="tabs" role="tablist">
+            <button role="tab" aria-selected="true" data-pane="words">① 词组策划</button>
+            <button role="tab" aria-selected="false" data-pane="prompt">② 生图提示词</button>
+            <button role="tab" aria-selected="false" data-pane="qc">③ 质检返工</button>
+          </div>
+          <div class="tabpane" id="pane-words">
+            <div class="row" style="justify-content: space-between; margin-bottom: 10px">
+              <span class="hint">直接改词，预览实时更新</span>
+              <button class="btn sm" id="fillPinyin" type="button">按词典补拼音</button>
+            </div>
+            <div class="words" id="wordList"></div>
+          </div>
+          <div class="tabpane" id="pane-prompt" hidden>
+            <div class="row" style="justify-content: space-between; margin-bottom: 10px">
+              <div class="seg" id="langSeg"><button type="button" aria-pressed="true" data-v="en">英文</button><button type="button" aria-pressed="false" data-v="zh">中文</button></div>
+              <div class="seg" id="textSeg"><button type="button" aria-pressed="true" data-v="0">有字版</button><button type="button" aria-pressed="false" data-v="1">无字版</button></div>
+            </div>
+            <textarea id="promptOut" rows="18" readonly aria-label="生图提示词"></textarea>
+            <p class="hint">英文版适合 GPT-Image / Midjourney / Flux；中文版适合即梦、可灵、通义万相。比例已按当前设置填好。中文字经常被模型写错，出现错字就用「无字版」出图，再用本工具的排版把字盖上去。</p>
+          </div>
+          <div class="tabpane" id="pane-qc" hidden>
+            <span class="label">自动检查（数据层）</span>
+            <div class="qc-auto" id="qcAuto"></div>
+            <span class="label">出图后人工检查（7 项）</span>
+            <div id="qcList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 拍照识字 -->
+    <section class="view" id="view-snap" hidden>
+      <div class="head">
+        <div>
+          <h1>拍照识字</h1>
+          <p>拍一张家里的照片，比如打开的冰箱。照片里的东西会直接标上汉字和拼音，点一下就能听读音、看笔顺、跟着写。学过的词自动进入复习。</p>
+        </div>
+      </div>
+      <div class="snap">
+        <div>
+          <div class="photo" id="photo">
+            <div class="empty" id="photoEmpty">
+              <div class="big">拍下孩子眼前的东西</div>
+              <div>冰箱、书桌、玩具筐、菜篮子都可以</div>
+              <div class="row" style="justify-content: center">
+                <label class="btn primary" for="fileInput">拍照 / 选照片</label>
+                <button class="btn" type="button" id="demoBtn">看示例：冰箱</button>
+              </div>
+            </div>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" capture="environment" hidden>
+          <div class="snapbar">
+            <label class="btn" for="fileInput">换一张</label>
+            <button class="btn" type="button" id="demoBtn2">示例：冰箱</button>
+            <span class="hint" id="snapStatus"></span>
+          </div>
+          <div class="snapbar">
+            <div class="objlist" id="objList"></div>
+          </div>
+          <form class="snapbar manual" id="manualForm">
+            <input type="text" id="manualInput" placeholder="没认出来？点照片上的位置，再输入词语，比如：鸡蛋" style="max-width: 360px">
+            <button class="btn" type="submit">手动标注</button>
+          </form>
+        </div>
+        <aside class="panel learn" id="learn">
+          <div class="empty">点照片上的标签，开始学这个词。</div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 复习 -->
+    <section class="view" id="view-review" hidden>
+      <div class="head">
+        <div>
+          <h1>复习</h1>
+          <p>按 1 → 2 → 4 → 7 → 15 → 30 天的间隔安排复习。题目用孩子自己拍的照片，看图选字，答对的词往后推，答错的 5 分钟后再出现。</p>
+        </div>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="rv">
+        <div class="panel quiz" id="quiz"></div>
+        <div class="panel deck" id="deck"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="settings">
+  <form method="dialog" id="settingsForm">
+    <h2>模型设置</h2>
+    <p class="hint" style="margin: 0">内置词库和示例照片不需要 Key。策划任意汉字、识别真实照片需要一个大模型；拍照识字需要支持图片的模型。Key 只保存在本机浏览器。正式上线请改成自己的后端代理，不要把 Key 放在前端。</p>
+    <div><label class="label" for="sPreset">服务商</label><select id="sPreset"></select></div>
+    <div><label class="label" for="sBase">接口地址</label><input type="text" id="sBase"></div>
+    <div><label class="label" for="sModel">模型</label><input type="text" id="sModel"></div>
+    <div><label class="label" for="sKey">API Key</label><input type="password" id="sKey" autocomplete="off"></div>
+    <div class="row" style="justify-content: flex-end">
+      <button class="btn ghost" value="cancel" type="submit">取消</button>
+      <button class="btn primary" value="save" id="saveSettings" type="submit">保存</button>
+    </div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="vendor/pinyin-pro.js"></script>
+<script src="vendor/hanzi-writer.min.js"></script>
+<script src="vendor/jszip.min.js"></script>
+<script src="core/lexicon.js"></script>
+<script src="core/planner.js"></script>
+<script src="core/render.js"></script>
+<script src="core/ai.js"></script>
+<script src="core/srs.js"></script>
+<script src="core/demo.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

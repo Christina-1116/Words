@@ -1,0 +1,39 @@
+<view class="wrap">
+  <view class="h1 serif">复习</view>
+  <view class="lead">1 → 2 → 4 → 7 → 15 → 30 天间隔，用孩子自己拍的照片出题。</view>
+  <view class="stats">
+    <view class="stat hot"><view class="n">{{st.due}}</view><view class="hint">现在要复习</view></view>
+    <view class="stat"><view class="n">{{st.tomorrow}}</view><view class="hint">24 小时内</view></view>
+    <view class="stat"><view class="n">{{st.learning}}</view><view class="hint">学习中</view></view>
+    <view class="stat"><view class="n">{{st.mastered}}</view><view class="hint">已掌握</view></view>
+  </view>
+
+  <view class="card quiz">
+    <block wx:if="{{state === 'quiz'}}">
+      <view class="pic"><image wx:if="{{card.thumb}}" src="{{card.thumb}}" mode="aspectFill" /><text wx:else>{{card.emoji}}</text></view>
+      <view class="row" style="justify-content: center"><text class="serif" style="font-size: 36rpx; font-weight: 600">这是什么？</text><view class="btn sm" bindtap="hear">听一听</view></view>
+      <view class="opts">
+        <view wx:for="{{opts}}" wx:key="id" class="opt serif {{marks[item.id]}}" data-id="{{item.id}}" bindtap="answer">{{item.zh}}<view class="hint" wx:if="{{marks[item.id] === 'right'}}">{{item.pinyin}}</view></view>
+      </view>
+      <view class="hint">还剩 {{st.due}} 个</view>
+    </block>
+    <block wx:elif="{{state === 'few'}}">
+      <view class="serif" style="font-size: 34rpx">先去拍照学几个词</view>
+      <view class="hint">至少 2 个词才能出选择题</view>
+      <view class="btn primary" bindtap="goSnap">去拍照识字</view>
+    </block>
+    <block wx:else>
+      <view class="serif" style="font-size: 34rpx">今天的复习都完成了</view>
+      <view class="hint">下一个词 {{nextLabel}}到期</view>
+    </block>
+  </view>
+
+  <view class="card" style="padding: 0 0 10rpx">
+    <view style="padding: 24rpx 28rpx 10rpx; font-weight: 600">我的词（{{deck.length}}）</view>
+    <view class="it" wx:for="{{deck}}" wx:key="id">
+      <view class="th"><image wx:if="{{item.thumb}}" src="{{item.thumb}}" mode="aspectFill" /><text wx:else>{{item.emoji}}</text></view>
+      <view style="flex: 1"><view class="serif" style="font-weight: 600; font-size: 32rpx">{{item.zh}}</view><view class="hint">{{item.pinyin}} · {{item.en}}</view></view>
+      <view class="hint">{{item.next}}</view>
+    </view>
+  </view>
+</view>

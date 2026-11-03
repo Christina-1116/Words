@@ -1,0 +1,51 @@
+<view class="wrap">
+  <view class="h1 serif">拍照识字</view>
+  <view class="lead">拍下孩子眼前的东西，照片里的物品立刻标上汉字和拼音。</view>
+
+  <view class="photo" wx:if="{{photo}}" style="aspect-ratio: {{aspect}}">
+    <image src="{{photo}}" mode="aspectFit" class="img" bindtap="tapPhoto" />
+    <view wx:if="{{scanning}}" class="scan"></view>
+    <view wx:for="{{objects}}" wx:key="id" class="obj {{index === sel ? 'on' : ''}}"
+      style="left: {{item.box[0] / 10}}%; top: {{item.box[1] / 10}}%; width: {{(item.box[2] - item.box[0]) / 10}}%; height: {{(item.box[3] - item.box[1]) / 10}}%">
+      <view class="tag" style="animation-delay: {{index * 0.12}}s" data-i="{{index}}" catchtap="select">
+        <view class="zh serif">{{item.zh}}</view><view class="py">{{item.pinyin}}</view>
+      </view>
+    </view>
+  </view>
+  <view class="empty card" wx:else>
+    <view class="serif" style="font-size: 36rpx; font-weight: 600">冰箱、书桌、玩具筐都可以</view>
+    <view class="hint">也可以先看一个示例</view>
+  </view>
+
+  <view class="row" style="margin-top: 20rpx">
+    <view class="btn primary" bindtap="choose">拍照 / 选照片</view>
+    <view class="btn" bindtap="demo">示例：冰箱</view>
+    <view wx:if="{{objects.length}}" class="btn" bindtap="addAll">全部加入复习</view>
+  </view>
+  <view class="hint" style="margin-top: 12rpx">{{status}}</view>
+  <view wx:if="{{photo && !aiOk}}" class="row" style="margin-top: 12rpx">
+    <input placeholder="点照片位置，再输入词语" value="{{manual}}" bindinput="onManual" style="flex: 1" />
+    <view class="btn" bindtap="addManual">手动标注</view>
+  </view>
+
+  <view class="card learn" wx:if="{{cur}}">
+    <view class="row" style="justify-content: space-between">
+      <view><view class="lw-py">{{cur.pinyin}}</view><view class="lw-en">{{cur.en}}</view></view>
+      <view class="row"><view class="btn sm" bindtap="sayZh">读中文</view><view class="btn sm" bindtap="sayEn">读英文</view></view>
+    </view>
+    <view class="grids">
+      <view class="tzg" wx:for="{{curChars}}" wx:key="index">
+        <canvas type="2d" id="w{{index}}" class="wc" data-i="{{index}}" bindtouchstart="ts" bindtouchmove="tm" disable-scroll="{{writing}}"></canvas>
+      </view>
+    </view>
+    <view class="row">
+      <view class="btn primary sm" bindtap="animate">看笔顺</view>
+      <view class="btn sm" bindtap="practice">{{writing ? '再写一遍' : '跟着写'}}</view>
+      <text class="hint" wx:if="{{writing}}">照着灰色笔画描一描</text>
+    </view>
+    <view wx:if="{{cur.sentence}}" class="sent serif">{{cur.sentence}}</view>
+    <view wx:if="{{cur.sentence_en}}" class="lw-en">{{cur.sentence_en}}</view>
+    <view class="hint">已加入复习</view>
+  </view>
+  <canvas type="2d" id="work" class="offstage"></canvas>
+</view>

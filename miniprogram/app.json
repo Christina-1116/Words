@@ -1,0 +1,17 @@
+{
+  "pages": ["pages/family/index", "pages/snap/index", "pages/review/index", "pages/settings/index"],
+  "window": { "navigationBarBackgroundColor": "#F3F4F1", "navigationBarTextStyle": "black", "navigationBarTitleText": "识字工坊", "backgroundColor": "#F3F4F1" },
+  "tabBar": {
+    "color": "#66706B", "selectedColor": "#2E6A58", "backgroundColor": "#FFFFFF", "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/family/index", "text": "字族图" },
+      { "pagePath": "pages/snap/index", "text": "拍照识字" },
+      { "pagePath": "pages/review/index", "text": "复习" }
+    ]
+  },
+  "plugins": { "WechatSI": { "version": "0.3.5", "provider": "wx069ba97219f66d99" } },
+  "permission": { "scope.writePhotosAlbum": { "desc": "保存识字图到相册" } },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

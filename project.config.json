@@ -1,0 +1,10 @@
+{
+  "description": "识字工坊：字族图 + 拍照识字 + 间隔复习",
+  "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "compileType": "miniprogram",
+  "appid": "touristappid",
+  "projectname": "hanzi-studio",
+  "setting": { "es6": true, "enhance": true, "postcss": true, "minified": true, "urlCheck": false },
+  "libVersion": "3.4.0"
+}
