@@ -12,5 +12,5 @@ Page({
     this.setData({ presetIndex: +e.detail.value, 's.preset': k, 's.provider': p.provider, 's.base': p.base, 's.model': p.model });
   },
   edit(e) { this.setData({ ['s.' + e.currentTarget.dataset.k]: e.detail.value.trim() }); },
-  save() { store.set('settings', this.data.s); wx.showToast({ title: '已保存' }); setTimeout(() => wx.navigateBack(), 600); }
+  save() { store.set('settings', this.data.s); ai.refresh(); wx.showToast({ title: '已保存' }); setTimeout(() => wx.navigateBack(), 600); }
 });

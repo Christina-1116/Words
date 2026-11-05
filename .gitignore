@@ -1,1 +1,3 @@
 node_modules/
+cloudfunctions/aiProxy/secrets.js
+miniprogram/config.local.js

@@ -13,7 +13,7 @@ const fs = wx.getFileSystemManager();
 
 Page({
   data: { photo: '', aspect: '4 / 3', objects: [], sel: -1, cur: null, curChars: [], scanning: false, status: '', aiOk: false, manual: '', writing: false, story: null, storyLoading: false, showEn: false, reading: -1 },
-  onShow() { this.setData({ aiOk: ai.available() }); },
+  onShow() { const set = () => this.setData({ aiOk: ai.can('vision') }); set(); (getApp().ready || Promise.resolve()).then(set); },
   onReady() {
     wx.createSelectorQuery().select('#work').fields({ node: true }).exec(r => { this.work = r[0].node; });
   },
@@ -32,7 +32,7 @@ Page({
     wx.getImageInfo({ src: path, success: info => {
       this.scene = '';
       this.resetStory(); this.setData({ photo: path, aspect: info.width + ' / ' + info.height, objects: [], sel: -1, cur: null });
-      if (!ai.available()) { this.setData({ status: '未接入视觉模型：点照片位置并输入词语手动标注，或去「字族图 → 模型设置」接入。' }); return; }
+      if (!ai.can('vision')) { this.setData({ status: '还没有配置看图模型（DeepSeek 不能看图）：点照片上的东西，再输入词语手动标注，标完照样生成小故事。' }); return; }
       const base64 = fs.readFileSync(path, 'base64');
       this.setData({ scanning: true, status: '正在识别…' });
       const t0 = Date.now();
