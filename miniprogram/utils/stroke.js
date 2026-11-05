@@ -68,15 +68,18 @@ class StrokeAnimator {
       ctx.restore();
     }
   }
-  animate(onDone) {
+  get strokes() { return this.paths.length; }
+  // onStroke(i, n)：开始画第 i+1 笔时回调，用于「第 i / n 笔」
+  animate(onDone, onStroke) {
     if (!this.data) { onDone && onDone(); return; }
     this.stop();
     const n = this.paths.length, per = 520, pause = 160; let i = 0, t0 = Date.now();
+    if (onStroke) onStroke(0, n);
     const tick = () => {
       const t = Date.now() - t0;
       if (t < per) this.render(i, t / per);
       else if (t < per + pause) this.render(i + 1, 0);
-      else { i++; t0 = Date.now(); if (i >= n) { this.render(n, 0); this.timer = null; onDone && onDone(); return; } }
+      else { i++; t0 = Date.now(); if (i >= n) { this.render(n, 0); this.timer = null; onDone && onDone(); return; } if (onStroke) onStroke(i, n); }
       this.timer = this.canvas.requestAnimationFrame(tick);
     };
     this.render(0, 0); this.timer = this.canvas.requestAnimationFrame(tick);

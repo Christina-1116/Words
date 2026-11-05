@@ -1,0 +1,8 @@
+<view class="nb" style="padding-top: {{top}}px; height: {{height}}px">
+  <view class="in" style="height: {{height}}px; padding-right: {{capsule}}px">
+    <view wx:if="{{back}}" class="back" bindtap="goBack">‹</view>
+    <text class="t">{{title}}</text>
+    <view class="slot"><slot></slot></view>
+  </view>
+</view>
+<view style="height: {{top + height}}px"></view>

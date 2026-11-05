@@ -1,1 +1,5 @@
-
+.st { display: flex; gap: 24rpx; align-items: center; }
+.li { display: flex; gap: 14rpx; align-items: center; margin-top: 12rpx; }
+.form { display: flex; flex-direction: column; gap: 16rpx; }
+.lb { font-size: 24rpx; color: var(--sub); margin-top: 6rpx; }
+.in { border: 4rpx solid var(--ink); border-radius: 22rpx; padding: 14rpx 20rpx; background: var(--paper); font-size: 28rpx; }

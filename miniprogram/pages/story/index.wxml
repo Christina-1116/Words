@@ -1,0 +1,30 @@
+<nav-bar title="小故事" back="{{true}}"><text class="pill k" bindtap="again">换一个 ↻</text></nav-bar>
+<view class="wrap notab">
+  <view class="card book" wx:if="{{story}}">
+    <view class="bh">
+      <image class="deer" src="/assets/deer.svg" mode="aspectFit" />
+      <view><view class="cute bt">{{story.title}}</view><view class="ben">{{story.title_en}}</view></view>
+    </view>
+    <view wx:for="{{story.view}}" wx:for-item="line" wx:for-index="li" wx:key="li" class="sl {{li === reading ? 'now' : ''}}" style="animation-delay: {{0.1 + li * 0.3}}s" data-i="{{li}}" bindtap="readOne">
+      <view class="zh brush"><block wx:for="{{line.segs}}" wx:for-item="g" wx:key="index"><text wx:if="{{g.w === undefined}}">{{g.t}}</text><view wx:else class="w" data-zh="{{g.t}}" catchtap="learn"><text class="rt">{{g.py}}</text><text>{{g.t}}</text></view><text wx:if="{{g.emoji}}">{{g.emoji}}</text></block></view>
+      <view class="ben" wx:if="{{lang === 'en' || showEn}}">{{line.en}}</view>
+    </view>
+  </view>
+  <view class="card pad loading" wx:else>
+    <image class="deer" src="/assets/deer.svg" mode="aspectFit" />
+    <view class="bubble">我在用照片里的东西编故事…</view>
+  </view>
+
+  <view class="card player" wx:if="{{story}}">
+    <view class="play" bindtap="toggle">{{playing ? '❚❚' : '▶'}}</view>
+    <view class="pm">
+      <view class="track"><view class="fill" style="width: {{progress}}%"></view></view>
+      <view class="hint">{{playing ? '第 ' + (reading + 1) + ' 句 / 共 ' + story.lines.length + ' 句' : '共 ' + story.lines.length + ' 句'}} · {{lang === 'en' ? 'English' : '中文'}}</view>
+    </view>
+    <view class="pill {{lang === 'en' ? 'o' : ''}}" bindtap="switchLang">EN</view>
+  </view>
+  <view class="between" wx:if="{{story}}">
+    <text class="hint">{{story.source === 'ai' ? 'AI 现编' : '离线模板'}} · 点黄色的词，马上学它</text>
+    <text class="pill" bindtap="toggleEn">{{showEn ? '隐藏英文' : '显示英文'}}</text>
+  </view>
+</view>

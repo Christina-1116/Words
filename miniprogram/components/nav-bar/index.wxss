@@ -1,0 +1,5 @@
+.nb { position: fixed; left: 0; right: 0; top: 0; z-index: 50; background: rgba(243,235,221,.94); }
+.in { display: flex; align-items: center; gap: 12rpx; padding-left: 36rpx; box-sizing: border-box; }
+.t { font-family: "ZCOOL KuaiLe", "Yuanti SC", "PingFang SC", sans-serif; font-size: 44rpx; color: #2B2420; }
+.back { font-size: 56rpx; line-height: 1; padding-right: 6rpx; color: #2B2420; }
+.slot { margin-left: auto; padding-right: 16rpx; }

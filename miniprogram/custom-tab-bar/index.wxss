@@ -1,0 +1,5 @@
+.tb { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: #FFF9EF; border-top: 5rpx solid #2B2420; padding: 12rpx 8rpx calc(12rpx + env(safe-area-inset-bottom)); z-index: 60; }
+.it { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4rpx; color: #8A7A68; font-size: 22rpx; }
+.g { font-family: "ZCOOL KuaiLe", "Yuanti SC", "PingFang SC", sans-serif; font-size: 40rpx; line-height: 1.2; padding: 0 12rpx; border-radius: 18rpx; border: 4rpx solid transparent; }
+.on { color: #E8743B; }
+.on .g { background: #E8743B; color: #fff; border-color: #2B2420; }

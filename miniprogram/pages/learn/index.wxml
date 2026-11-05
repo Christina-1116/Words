@@ -1,0 +1,44 @@
+<nav-bar title="{{w.zh}}" back="{{true}}"><text class="pill m" wx:if="{{inDeck}}">已加入复习</text></nav-bar>
+<view class="wrap notab">
+  <view class="card pad head">
+    <view>
+      <view class="hpy">{{w.pinyin}}</view>
+      <view class="hzh brush"><text wx:for="{{chars}}" wx:key="index" class="{{index === cur ? 'curc' : ''}}">{{item}}</text></view>
+      <view class="hen">{{w.en}}</view>
+    </view>
+    <text class="hemoji">{{w.emoji}}</text>
+  </view>
+
+  <view class="card pad strokes">
+    <view class="between">
+      <text class="title">笔顺 · {{chars[cur]}} <text class="hint" wx:if="{{total}}">第 {{step}} / {{total}} 笔</text></text>
+      <text class="seal">{{chars[cur]}}</text>
+    </view>
+    <view class="grids">
+      <view wx:for="{{chars}}" wx:key="index" class="tzg g {{index === cur ? 'focus' : ''}}" data-i="{{index}}" bindtap="pickChar">
+        <view class="h"></view><view class="v"></view>
+        <canvas type="2d" id="w{{index}}" class="wc" data-i="{{index}}" bindtouchstart="ts" bindtouchmove="tm" disable-scroll="{{writing}}"></canvas>
+      </view>
+    </view>
+    <view class="steps" wx:if="{{total}}">
+      <view wx:for="{{total}}" wx:key="*this" class="sb {{step - 1 > index ? 'd' : index === step - 1 ? 'n' : ''}}">{{index + 1}}</view>
+    </view>
+  </view>
+
+  <view class="actions">
+    <view class="btn col" bindtap="say"><text class="ic">🔊</text>读一读</view>
+    <view class="btn y col" bindtap="practice"><text class="ic">✍️</text>{{writing ? '擦掉重写' : '跟着写'}}</view>
+    <view class="btn w col" bindtap="sayEn"><text class="ic">🔤</text>English</view>
+  </view>
+  <view class="row" style="justify-content: center"><view class="btn sm w" bindtap="animate">▶ 看笔顺动画</view></view>
+
+  <view class="card pad" wx:if="{{w.sentence}}" bindtap="saySentence">
+    <view class="sent brush"><block wx:for="{{sentSegs}}" wx:key="index"><text class="{{item.w ? 'mk' : ''}}">{{item.t}}</text></block></view>
+    <view class="hen" wx:if="{{w.sentence_en}}">{{w.sentence_en}}</view>
+  </view>
+
+  <view class="tipline" bindtap="openFamily">
+    <image class="deer" src="/assets/deer.svg" mode="aspectFit" />
+    <view class="bubble" style="flex: 1">{{tip}}</view>
+  </view>
+</view>

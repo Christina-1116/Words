@@ -1,0 +1,46 @@
+<nav-bar title="识字工坊"><text class="pill m" wx:if="{{streak}}">🔥 连续 {{streak}} 天</text></nav-bar>
+<view class="wrap">
+  <view class="card hero">
+    <view class="hero-l">
+      <text class="pill o">今日一字</text>
+      <view class="cute hello">{{hello}}，小朋友！</view>
+      <view class="hint">{{due ? '有 ' + due + ' 个词等你复习' : '今天拍一拍，认几个新字吧'}}</view>
+      <view class="today">
+        <view class="tzg small" bindtap="openToday"><view class="h"></view><view class="v"></view><view class="ch">{{today.char}}</view></view>
+        <view>
+          <view class="today-py">{{today.pinyin}}</view>
+          <view class="hint">{{today.english}}</view>
+          <view class="pill press" style="margin-top: 12rpx" bindtap="sayToday">🔊 读一读</view>
+        </view>
+      </view>
+    </view>
+    <image class="deer hero-deer" src="/assets/deer.svg" mode="aspectFit" />
+    <text class="spark">✦</text>
+  </view>
+
+  <view class="card tile photo press" bindtap="goSnap">
+    <view class="cute big">📷 拍一拍，认一认</view>
+    <view class="tip">拍冰箱、书桌、玩具筐，照片里的东西马上变成字</view>
+    <text class="em">🍎</text>
+  </view>
+  <view class="tiles">
+    <view class="card tile fam press" bindtap="goFamily">
+      <view class="cute big">字族图</view><view class="tip dark">一个字带出 9 个词</view><text class="em brush">{{today.char}}</text>
+    </view>
+    <view class="card tile rev press" bindtap="goReview">
+      <view class="cute big">复习</view><view class="tip dark2">{{due ? due + ' 个词等你' : '今天都复习完了'}}</view><text class="em">🗓️</text>
+    </view>
+  </view>
+
+  <view class="card pad" wx:if="{{recent.length}}">
+    <view class="between"><text class="title">最近拍的</text><text class="hint">共 {{deckSize}} 个词</text></view>
+    <view class="recent">
+      <view wx:for="{{recent}}" wx:key="key" class="rc rc{{index % 2}}"><view class="rc-e">{{item.emoji}}</view><view class="cute rc-t">{{item.scene}} · {{item.words.length}} 个词</view></view>
+    </view>
+  </view>
+
+  <view class="card pad between">
+    <view><view class="title">本周</view><view class="hint">学了 {{week.total}} 次</view></view>
+    <view class="dots"><view wx:for="{{week.list}}" wx:key="name" class="dot {{item.done ? 'f' : ''}} {{item.today ? 't' : ''}}">{{item.name}}</view></view>
+  </view>
+</view>

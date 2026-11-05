@@ -42,6 +42,20 @@ cd web && python3 -m http.server 8000   # 打开 http://localhost:8000
 
 不填 Key 也能用：16 个内置字、示例冰箱、手动标注、复习都离线可用。在「设置」里填 Key 后可以策划任意汉字、识别真实照片。
 
+## 小程序页面（按 `web/design/mockups.html` 效果图实现）
+
+| 页面 | 内容 |
+| --- | --- |
+| 首页 `pages/home` | 今日一字（田字格）、拍一拍入口、字族图 / 复习入口、最近拍的、本周打卡 |
+| 拍照 `pages/snap` | 拍照 / 相册 / 示例冰箱 → 贴纸标签 → 识别结果；自动生成小故事；没配看图模型时手动贴字 |
+| 学一个词 `pages/learn` | 笔顺动画（第 n / N 笔）、田字格描红、读一读、English、例句、小鹿提示（可跳到字族图） |
+| 小故事 `pages/story` | 逐句朗读 + 高亮 + 进度条、中英切换、点词去学、换一个 |
+| 字族图 `pages/family` | 输入字 / 横滑选字、柿子等 4 套配色、质检摘要、保存相册、词组 / 提示词 / 质检返工 |
+| 复习 `pages/review` | 进度珠、看图选字、未来 7 天复习日历、我的词 |
+| 设置 `pages/settings` | 当前可用模型（文字 / 看图）、云函数或直连 |
+
+导航栏和底部标签栏都是自定义组件（`components/nav-bar`、`custom-tab-bar`）。效果图里的字体（ZCOOL KuaiLe、Ma Shan Zheng）在 `utils/fonts.js` 里配置 CDN 地址后加载；不配置时用系统圆体 / 楷体。
+
 ## 运行小程序
 
 1. 微信开发者工具 → 导入项目，选仓库根目录（`project.config.json` 已指向 `miniprogram/`）。

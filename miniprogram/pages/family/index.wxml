@@ -1,75 +1,64 @@
+<nav-bar title="字族图"><text class="pill press" bindtap="goSettings">⚙︎ 设置</text></nav-bar>
 <view class="wrap">
-  <view class="topbar">
-    <view>
-      <view class="h1 serif">字族图生成器</view>
-      <view class="lead">3 本义 + 3 生活 + 2 动作 + 1 反差</view>
-    </view>
-    <view class="btn sm" bindtap="goSettings">模型设置</view>
+  <view class="ctl">
+    <input class="charin brush" maxlength="1" value="{{inputChar}}" bindinput="onInput" confirm-type="done" bindconfirm="generate" />
+    <scroll-view scroll-x="{{true}}" class="chips" enhanced="{{true}}" show-scrollbar="{{false}}">
+      <view wx:for="{{chars}}" wx:key="*this" class="ch brush {{item === data.char ? 'on' : ''}}" data-c="{{item}}" bindtap="pick">{{item}}</view>
+    </scroll-view>
+  </view>
+  <view class="btn" wx:if="{{inputChar && inputChar !== data.char}}" bindtap="generate">{{loading ? '✏️ 正在策划「' + inputChar + '」…' : '生成「' + inputChar + '」字家族'}}</view>
+
+  <view class="card poster"><canvas type="2d" id="poster" class="pc" style="aspect-ratio: {{aspect}}"></canvas></view>
+
+  <view class="between">
+    <view class="row" style="gap: 10rpx"><text wx:for="{{ratios}}" wx:key="*this" class="pill {{item === ratio ? 'o' : ''}}" data-v="{{item}}" bindtap="setRatio">{{item}}</text></view>
+    <view class="row" style="gap: 10rpx"><text wx:for="{{themes}}" wx:key="key" class="pill {{item.key === theme ? 'm' : ''}}" data-v="{{item.key}}" bindtap="setTheme">{{item.name}}</text></view>
   </view>
 
-  <view class="card">
-    <view class="inrow">
-      <input class="charin serif" maxlength="1" value="{{inputChar}}" bindinput="onInput" confirm-type="done" bindconfirm="generate" />
-      <view class="btn primary" bindtap="generate">{{loading ? '策划中…' : '生成'}}</view>
-    </view>
-    <view class="label" style="margin-top: 20rpx">内置词库</view>
-    <view class="chips">
-      <view wx:for="{{chars}}" wx:key="*this" class="chip serif {{item === data.char ? 'on' : ''}}" data-c="{{item}}" bindtap="pick">{{item}}</view>
-    </view>
-    <view class="opts">
-      <view class="seg">
-        <view wx:for="{{ratios}}" wx:key="*this" class="{{item === ratio ? 'on' : ''}}" data-v="{{item}}" bindtap="setRatio">{{item}}</view>
-      </view>
-      <view class="themes">
-        <view wx:for="{{themes}}" wx:key="key" class="sw {{item.key === theme ? 'on' : ''}}" data-v="{{item.key}}" bindtap="setTheme">
-          <view class="dot" style="background: linear-gradient(135deg, {{item.bg}} 50%, {{item.accent}} 50%)"></view>{{item.name}}
-        </view>
-      </view>
-    </view>
+  <view class="card qc" bindtap="openQC">
+    <text>{{qcBad ? '⚠️' : '✅'}}</text>
+    <text class="qt">{{qcBad ? '有 ' + qcBad + ' 项要看一下' : '自动质检通过 · 每个词都含「' + data.char + '」'}}</text>
+    <text class="pill {{qcBad ? 'm' : 's'}}">{{qcBad ? '去看看' : '通过'}}</text>
   </view>
 
-  <view class="stage">
-    <canvas type="2d" id="poster" class="poster" style="aspect-ratio: {{aspect}}"></canvas>
-    <view class="row" style="justify-content: space-between; margin-top: 20rpx">
-      <text class="hint">{{src}}</text>
-      <view class="row">
-        <view class="btn" bindtap="copyPrompt">复制提示词</view>
-        <view class="btn primary" bindtap="save">保存到相册</view>
-      </view>
-    </view>
+  <view class="two">
+    <view class="btn w" bindtap="copyPrompt">复制提示词</view>
+    <view class="btn" bindtap="save">保存到相册</view>
   </view>
 
-  <view class="card">
+  <view class="card pad">
     <view class="tabs">
-      <view wx:for="{{panes}}" wx:key="key" class="{{pane === item.key ? 'on' : ''}}" data-v="{{item.key}}" bindtap="setPane">{{item.name}}</view>
+      <view wx:for="{{panes}}" wx:key="key" class="cute tab {{pane === item.key ? 'on' : ''}}" data-v="{{item.key}}" bindtap="setPane">{{item.name}}</view>
     </view>
     <block wx:if="{{pane === 'words'}}">
+      <view class="hint" style="margin-bottom: 8rpx">{{src}} · 3 本义 + 3 生活 + 2 动作 + 1 反差</view>
       <view class="word" wx:for="{{data.words}}" wx:key="word">
         <text class="cat {{item.cat}}">{{catZh[item.cat]}}</text>
-        <text class="w serif">{{item.word}}</text>
-        <text class="py">{{item.pinyin}}</text>
-        <text class="en">{{item.english}}</text>
+        <view class="wm"><text class="brush ww">{{item.word}}</text><text class="py">{{item.pinyin}}</text></view>
+        <text class="we">{{item.english}}</text>
         <text class="em">{{item.emoji}}</text>
       </view>
     </block>
     <block wx:if="{{pane === 'prompt'}}">
       <view class="row" style="margin-bottom: 16rpx">
-        <view class="seg"><view class="{{lang === 'en' ? 'on' : ''}}" data-v="en" bindtap="setLang">英文</view><view class="{{lang === 'zh' ? 'on' : ''}}" data-v="zh" bindtap="setLang">中文</view></view>
-        <view class="seg"><view class="{{!textless ? 'on' : ''}}" data-v="0" bindtap="setTextless">有字版</view><view class="{{textless ? 'on' : ''}}" data-v="1" bindtap="setTextless">无字版</view></view>
+        <text class="pill {{lang === 'en' ? 'o' : ''}}" data-v="en" bindtap="setLang">英文</text><text class="pill {{lang === 'zh' ? 'o' : ''}}" data-v="zh" bindtap="setLang">中文</text>
+        <text class="pill {{!textless ? 'm' : ''}}" data-v="0" bindtap="setTextless">有字版</text><text class="pill {{textless ? 'm' : ''}}" data-v="1" bindtap="setTextless">无字版</text>
       </view>
       <view class="prompt">{{prompt}}</view>
+      <view class="hint" style="margin-top: 12rpx">英文版给 GPT-Image / Midjourney，中文版给即梦、可灵。字被写错就用「无字版」出图，再用这里的排版补字。</view>
     </block>
     <block wx:if="{{pane === 'qc'}}">
-      <view wx:for="{{auto}}" wx:key="id" class="auto {{item.level}}">{{item.msg}}</view>
+      <view wx:for="{{auto}}" wx:key="id" class="auto {{item.level}}">{{item.level === 'ok' ? '✓' : item.level === 'warn' ? '!' : '✗'}} {{item.msg}}</view>
+      <view class="hint" style="margin: 16rpx 0 4rpx">出图后人工检查：</view>
       <view wx:for="{{checklist}}" wx:key="id" class="check">
-        <view class="row" style="justify-content: space-between">
+        <view class="between">
           <text class="ct">{{qc[item.id] === 'pass' ? '✓ ' : qc[item.id] === 'fail' ? '✗ ' : ''}}{{item.title}}</text>
-          <view class="row"><view class="btn sm" data-id="{{item.id}}" data-v="pass" bindtap="mark">通过</view><view class="btn sm" data-id="{{item.id}}" data-v="fail" bindtap="mark">返工</view></view>
+          <view class="row" style="gap: 10rpx"><text class="pill {{qc[item.id] === 'pass' ? 's' : ''}}" data-id="{{item.id}}" data-v="pass" bindtap="mark">通过</text><text class="pill {{qc[item.id] === 'fail' ? 'o' : ''}}" data-id="{{item.id}}" data-v="fail" bindtap="mark">返工</text></view>
         </view>
         <view class="hint">{{item.detail}}</view>
         <view wx:if="{{qc[item.id] === 'fail'}}" class="fix">
-          <view><text style="font-weight: 600">{{fixes[item.fix].name}}：</text>{{fixes[item.fix].how}}</view>
-          <view class="btn sm" style="margin-top: 12rpx" data-fix="{{item.fix}}" bindtap="copyFix">复制返工提示词</view>
+          <view><text class="cute">{{fixes[item.fix].name}}：</text>{{fixes[item.fix].how}}</view>
+          <view class="btn sm w" style="margin-top: 12rpx; display: inline-flex" data-fix="{{item.fix}}" bindtap="copyFix">复制返工提示词</view>
         </view>
       </view>
     </block>

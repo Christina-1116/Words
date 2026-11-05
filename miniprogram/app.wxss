@@ -1,17 +1,39 @@
-page { --bg: #F3F4F1; --panel: #FFFFFF; --sunk: #E9EBE6; --ink: #1D2622; --muted: #66706B; --line: #D9DDD6; --accent: #2E6A58; --accent-soft: #DCEAE3; --cinnabar: #B5432F;
-  background: var(--bg); color: var(--ink); font-size: 28rpx; line-height: 1.55; font-family: -apple-system, "PingFang SC", sans-serif; }
-.serif { font-family: "Songti SC", "STSong", "Noto Serif SC", serif; }
-.wrap { padding: 28rpx 32rpx 60rpx; }
-.h1 { font-size: 44rpx; font-weight: 600; }
-.lead { color: var(--muted); font-size: 26rpx; margin-top: 6rpx; }
-.card { background: var(--panel); border: 1rpx solid var(--line); border-radius: 20rpx; padding: 28rpx; margin-top: 24rpx; }
-.label { font-size: 24rpx; color: var(--muted); margin-bottom: 12rpx; }
-.row { display: flex; flex-wrap: wrap; gap: 14rpx; align-items: center; }
-.btn { display: inline-flex; align-items: center; justify-content: center; padding: 14rpx 28rpx; border-radius: 16rpx; border: 1rpx solid var(--line); background: var(--panel); font-size: 28rpx; line-height: 1.3; margin: 0; }
-.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
-.btn.sm { padding: 8rpx 20rpx; font-size: 24rpx; }
-.hint { color: var(--muted); font-size: 24rpx; }
-.seg { display: inline-flex; background: var(--sunk); border-radius: 14rpx; padding: 6rpx; }
-.seg view { padding: 8rpx 22rpx; border-radius: 10rpx; font-size: 26rpx; color: var(--muted); }
-.seg .on { background: var(--panel); color: var(--ink); }
-input, textarea { border: 1rpx solid var(--line); border-radius: 14rpx; padding: 14rpx 18rpx; background: var(--panel); }
+/* 识字工坊 设计规范：宣纸米底 + 墨线描边 + 错位贴纸阴影；柿子橙主色，朱砂红只给主字/印章/正在读 */
+page {
+  --paper: #F3EBDD; --paper2: #EADFCB; --card: #FFF9EF; --ink: #2B2420; --sub: #8A7A68; --line: #CDBFA8;
+  --persimmon: #E8743B; --cinnabar: #C8452F; --mustard: #F2B84B; --sage: #9DB58E; --sky: #A9C7D6; --blush: #F29C8F;
+  --f-cute: "ZCOOL KuaiLe", "Yuanti SC", "PingFang SC", sans-serif;
+  --f-brush: "Ma Shan Zheng", "Kaiti SC", "STKaiti", "KaiTi", serif;
+  --f-py: "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  background: var(--paper);
+  background-image: radial-gradient(circle at 20% 10%, rgba(255,249,239,.7), transparent 40%), radial-gradient(circle at 90% 80%, rgba(234,223,203,.8), transparent 45%);
+  color: var(--ink); font-size: 28rpx; line-height: 1.55; font-family: -apple-system, "PingFang SC", sans-serif;
+}
+.wrap { padding: 8rpx 36rpx calc(200rpx + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 28rpx; }
+.wrap.notab { padding-bottom: calc(60rpx + env(safe-area-inset-bottom)); }
+.cute { font-family: var(--f-cute); }
+.brush { font-family: var(--f-brush); }
+.py { font-family: var(--f-py); font-weight: 500; color: var(--sub); }
+.hint { color: var(--sub); font-size: 24rpx; }
+.row { display: flex; flex-wrap: wrap; gap: 16rpx; align-items: center; }
+.between { display: flex; justify-content: space-between; align-items: center; gap: 16rpx; }
+
+.card { background: var(--card); border: 5rpx solid var(--ink); border-radius: 40rpx; box-shadow: 8rpx 8rpx 0 var(--ink); }
+.pad { padding: 28rpx; }
+.pill { display: inline-flex; align-items: center; gap: 8rpx; border: 4rpx solid var(--ink); border-radius: 999rpx; padding: 2rpx 20rpx; font-family: var(--f-cute); font-size: 26rpx; background: var(--card); line-height: 1.5; }
+.pill.o { background: var(--persimmon); color: #fff; } .pill.m { background: var(--mustard); } .pill.s { background: var(--sage); } .pill.k { background: var(--sky); }
+.btn { display: flex; align-items: center; justify-content: center; gap: 10rpx; border: 5rpx solid var(--ink); border-radius: 32rpx; box-shadow: 6rpx 6rpx 0 var(--ink); background: var(--persimmon); color: #fff; font-family: var(--f-cute); font-size: 34rpx; padding: 18rpx 28rpx; line-height: 1.3; }
+.btn.w { background: var(--card); color: var(--ink); } .btn.y { background: var(--mustard); color: var(--ink); } .btn.g { background: var(--sage); color: var(--ink); }
+.btn.sm { font-size: 26rpx; padding: 8rpx 20rpx; border-width: 4rpx; box-shadow: 4rpx 4rpx 0 var(--ink); border-radius: 22rpx; }
+.btn:active, .press:active { transform: translate(4rpx, 4rpx); box-shadow: 2rpx 2rpx 0 var(--ink); }
+.title { font-family: var(--f-cute); font-size: 34rpx; }
+.seal { display: inline-flex; align-items: center; justify-content: center; width: 72rpx; height: 72rpx; background: var(--cinnabar); color: var(--card); border-radius: 14rpx; font-family: var(--f-brush); font-size: 46rpx; transform: rotate(-6deg); box-shadow: inset 0 0 0 6rpx var(--cinnabar), inset 0 0 0 9rpx rgba(255,249,239,.7); }
+.bubble { position: relative; background: var(--card); border: 4rpx solid var(--ink); border-radius: 28rpx; padding: 12rpx 24rpx; font-family: var(--f-cute); font-size: 28rpx; }
+.bubble::after { content: ""; position: absolute; left: -16rpx; top: 26rpx; width: 22rpx; height: 22rpx; background: var(--card); border-left: 4rpx solid var(--ink); border-bottom: 4rpx solid var(--ink); transform: rotate(45deg); }
+.deer { width: 120rpx; height: 130rpx; flex-shrink: 0; }
+
+/* 田字格 */
+.tzg { position: relative; width: 192rpx; height: 192rpx; background: var(--card); border: 5rpx solid var(--cinnabar); border-radius: 12rpx; box-sizing: border-box; }
+.tzg .h, .tzg .v { position: absolute; background: var(--cinnabar); opacity: .5; }
+.tzg .h { left: 0; right: 0; top: 50%; height: 2rpx; } .tzg .v { top: 0; bottom: 0; left: 50%; width: 2rpx; }
+.tzg .ch { position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-family: var(--f-brush); font-size: 140rpx; line-height: 1; }

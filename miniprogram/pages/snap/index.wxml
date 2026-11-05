@@ -1,70 +1,48 @@
+<nav-bar title="拍一拍"><text class="pill s" wx:if="{{scene}}">{{sceneEmoji}} {{scene}}</text></nav-bar>
 <view class="wrap">
-  <view class="h1 serif">拍照识字</view>
-  <view class="lead">拍下孩子眼前的东西，照片里的物品立刻标上汉字和拼音。</view>
-
-  <view class="photo" wx:if="{{photo}}" style="aspect-ratio: {{aspect}}">
+  <view class="photo card" wx:if="{{photo}}" style="aspect-ratio: {{aspect}}">
     <image src="{{photo}}" mode="aspectFit" class="img" bindtap="tapPhoto" />
     <view wx:if="{{scanning}}" class="scan"></view>
-    <view wx:for="{{objects}}" wx:key="id" class="obj {{index === sel ? 'on' : ''}}"
-      style="left: {{item.box[0] / 10}}%; top: {{item.box[1] / 10}}%; width: {{(item.box[2] - item.box[0]) / 10}}%; height: {{(item.box[3] - item.box[1]) / 10}}%">
-      <view class="tag" style="animation-delay: {{index * 0.12}}s" data-i="{{index}}" catchtap="select">
-        <view class="zh serif">{{item.zh}}</view><view class="py">{{item.pinyin}}</view>
-      </view>
+    <view wx:for="{{objects}}" wx:key="id" class="stk {{item.zh === sel ? 'on' : ''}}" data-zh="{{item.zh}}" catchtap="learn"
+      style="left: {{(item.box[0] + item.box[2]) / 20}}%; top: {{item.top}}%; --r: {{item.rot}}deg; animation-delay: {{index * 0.1}}s">
+      <view class="brush stk-zh">{{item.zh}}</view><view class="stk-py">{{item.pinyin}}</view>
     </view>
-  </view>
-  <view class="empty card" wx:else>
-    <view class="serif" style="font-size: 36rpx; font-weight: 600">冰箱、书桌、玩具筐都可以</view>
-    <view class="hint">也可以先看一个示例</view>
+    <view wx:if="{{pending}}" class="pin" style="left: {{pending.x}}%; top: {{pending.y}}%"></view>
   </view>
 
-  <view class="row" style="margin-top: 20rpx">
-    <view class="btn primary" bindtap="choose">拍照 / 选照片</view>
-    <view class="btn" bindtap="demo">示例：冰箱</view>
-    <view wx:if="{{objects.length}}" class="btn" bindtap="addAll">全部加入复习</view>
-  </view>
-  <view class="hint" style="margin-top: 12rpx">{{status}}</view>
-  <view wx:if="{{photo && !aiOk}}" class="row" style="margin-top: 12rpx">
-    <input placeholder="点照片位置，再输入词语" value="{{manual}}" bindinput="onManual" style="flex: 1" />
-    <view class="btn" bindtap="addManual">手动标注</view>
+  <view class="card empty" wx:else>
+    <image class="deer big-deer" src="/assets/deer.svg" mode="aspectFit" />
+    <view class="cute" style="font-size: 40rpx">拍下孩子眼前的东西</view>
+    <view class="hint">冰箱、书桌、玩具筐、菜篮子都可以</view>
+    <view class="btn y" style="margin-top: 12rpx" bindtap="demo">先看一个示例：冰箱</view>
   </view>
 
-  <view class="card story" wx:if="{{story}}">
-    <view class="st-head">
-      <text class="hero">{{story.hero}}</text>
-      <view><view class="serif st-title">{{story.title}}</view><view class="lw-en">{{story.title_en}}</view></view>
+  <view class="card pad found" wx:if="{{objects.length}}">
+    <view class="between"><text class="title">找到 {{objects.length}} 样东西 ✦</text><text class="hint">{{cost}}</text></view>
+    <view class="chips"><view wx:for="{{objects}}" wx:key="id" class="pill brush chip {{item.zh === sel ? 'o' : ''}}" data-zh="{{item.zh}}" bindtap="learn">{{item.zh}}</view></view>
+    <view class="between" style="margin-top: 8rpx">
+      <text class="hint">{{added ? '已全部加入复习' : '学过的词会自动进入复习'}}</text>
+      <view class="btn sm w" bindtap="addAll">{{added ? '✓ 已加入' : '全部加入复习'}}</view>
     </view>
-    <view wx:for="{{story.view}}" wx:for-item="line" wx:for-index="li" wx:key="li" class="sl {{li === reading ? 'reading' : ''}}" style="animation-delay: {{0.15 + li * 0.35}}s">
-      <view class="zh serif"><block wx:for="{{line.segs}}" wx:for-item="g" wx:key="index"><text wx:if="{{g.w === undefined}}">{{g.t}}</text><view wx:else class="sw-word" data-zh="{{g.t}}" catchtap="tapStoryWord"><view class="rt">{{g.py}}</view><view>{{g.t}}{{g.emoji}}</view></view></block></view>
-      <view class="lw-en" wx:if="{{showEn}}">{{line.en}}</view>
-    </view>
-    <view class="row">
-      <view class="btn primary sm" bindtap="readStory">读故事</view>
-      <view class="btn sm" data-lang="en" bindtap="readStory">Read in English</view>
-      <view class="btn sm" bindtap="toggleEn">{{showEn ? '隐藏英文' : '显示英文'}}</view>
-      <view class="btn sm" bindtap="newStory">换一个</view>
-    </view>
-    <view class="hint">{{story.source === 'ai' ? 'AI 现编' : '离线模板'}} · 点故事里的词可以学它</view>
   </view>
-  <view class="card" wx:elif="{{storyLoading}}"><text class="hint">✏️ 正在用照片里的东西编故事…</text></view>
 
-  <view class="card learn" wx:if="{{cur}}">
-    <view class="row" style="justify-content: space-between">
-      <view><view class="lw-py">{{cur.pinyin}}</view><view class="lw-en">{{cur.en}}</view></view>
-      <view class="row"><view class="btn sm" bindtap="sayZh">读中文</view><view class="btn sm" bindtap="sayEn">读英文</view></view>
+  <view class="card pad manual" wx:if="{{photo && !aiOk}}">
+    <view class="hint">{{pending ? '位置已记下，这个东西叫什么？' : '还没配看图模型：先点一下照片上的东西，再输入它的名字'}}</view>
+    <view class="row" style="flex-wrap: nowrap">
+      <input class="in" placeholder="比如：鸡蛋" value="{{manual}}" bindinput="onManual" confirm-type="done" bindconfirm="addManual" />
+      <view class="btn sm" bindtap="addManual">贴上去</view>
     </view>
-    <view class="grids">
-      <view class="tzg" wx:for="{{curChars}}" wx:key="index">
-        <canvas type="2d" id="w{{index}}" class="wc" data-i="{{index}}" bindtouchstart="ts" bindtouchmove="tm" disable-scroll="{{writing}}"></canvas>
-      </view>
-    </view>
-    <view class="row">
-      <view class="btn primary sm" bindtap="animate">看笔顺</view>
-      <view class="btn sm" bindtap="practice">{{writing ? '再写一遍' : '跟着写'}}</view>
-      <text class="hint" wx:if="{{writing}}">照着灰色笔画描一描</text>
-    </view>
-    <view wx:if="{{cur.sentence}}" class="sent serif">{{cur.sentence}}</view>
-    <view wx:if="{{cur.sentence_en}}" class="lw-en">{{cur.sentence_en}}</view>
-    <view class="hint">已加入复习</view>
+  </view>
+
+  <view class="tipline" wx:if="{{status}}">
+    <image class="deer" src="/assets/deer.svg" mode="aspectFit" />
+    <view class="bubble" style="flex: 1">{{status}}</view>
+  </view>
+
+  <view class="controls">
+    <view class="btn w side" bindtap="album">🖼️ 相册</view>
+    <view class="shutter" bindtap="camera">📷</view>
+    <view class="btn side {{storyReady ? 'y' : 'w'}}" bindtap="openStory">{{storyReady ? '📖 小故事' : storyLoading ? '✏️ 编故事…' : '📖 小故事'}}</view>
   </view>
   <canvas type="2d" id="work" class="offstage"></canvas>
 </view>

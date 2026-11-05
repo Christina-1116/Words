@@ -1,0 +1,5 @@
+<view class="tb">
+  <view wx:for="{{list}}" wx:key="path" class="it {{selected === index ? 'on' : ''}}" data-i="{{index}}" bindtap="go">
+    <text class="g">{{item.glyph}}</text><text class="l">{{item.text}}</text>
+  </view>
+</view>
