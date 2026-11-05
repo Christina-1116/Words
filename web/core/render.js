@@ -7,6 +7,7 @@
   else root.HZRender = factory();
 })(typeof self !== 'undefined' ? self : this, function () {
   var THEMES = {
+    persimmon: { name: '柿子', bg: '#F3EBDD', bg2: '#E6D9C2', card: '#FFF9EF', ink: '#2B2420', sub: '#8A7A68', accent: '#D9552F', line: 'rgba(43,36,32,', seal: '#D9552F', sealInk: '#FFF9EF' },
     mist:    { name: '雾青', bg: '#E6EAE8', bg2: '#D9DFDC', card: '#F7F8F6', ink: '#25343A', sub: '#76868B', accent: '#3C6273', line: 'rgba(37,52,58,', seal: '#3C6273', sealInk: '#F7F8F6' },
     paper:   { name: '宣纸', bg: '#F1ECE2', bg2: '#E6DECF', card: '#FBF8F2', ink: '#24201B', sub: '#857A6B', accent: '#9E3A2B', line: 'rgba(60,45,30,', seal: '#A63A2A', sealInk: '#FBF8F2' },
     celadon: { name: '青瓷', bg: '#E2EBE3', bg2: '#D3E0D5', card: '#F5F9F4', ink: '#1F3530', sub: '#6E8A80', accent: '#2F6B5A', line: 'rgba(31,53,48,', seal: '#2F6B5A', sealInk: '#F5F9F4' },

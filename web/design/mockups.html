@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>识字工坊 · UI 效果图</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans:wght@400;500;600&display=swap">
+<style>
+/* 设计规范：宣纸米底 + 墨线描边 + 错位贴纸阴影；柿子橙为主色，朱砂红只用于「主字/印章/正在读」 */
+:root {
+  --paper: #F3EBDD; --paper2: #EADFCB; --card: #FFF9EF; --ink: #2B2420; --sub: #8A7A68;
+  --persimmon: #E8743B; --cinnabar: #C8452F; --mustard: #F2B84B; --sage: #9DB58E; --sky: #A9C7D6; --blush: #F29C8F;
+  --f-cute: "ZCOOL KuaiLe", "Noto Sans SC", sans-serif; --f-brush: "Ma Shan Zheng", "KaiTi", serif;
+  --f-body: "Noto Sans SC", sans-serif; --f-py: "Noto Sans", sans-serif;
+}
+* { box-sizing: border-box }
+body { margin: 0; background: #D9CDB8; font-family: var(--f-body); color: var(--ink) }
+.board { padding: 56px 60px 70px; display: grid; gap: 40px }
+.board-head { display: flex; align-items: center; gap: 18px }
+.board-head h1 { font: 44px/1 var(--f-cute); margin: 0 }
+.board-head p { margin: 6px 0 0; color: #5E5245; font-size: 17px }
+.phones { display: grid; grid-template-columns: repeat(3, 390px); gap: 48px 44px }
+.cap { font: 20px var(--f-cute); margin: 0 0 12px 6px; display: flex; align-items: center; gap: 8px }
+.cap b { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--paper); font: 15px var(--f-py) }
+
+.phone { width: 390px; height: 844px; border-radius: 46px; border: 3px solid var(--ink); box-shadow: 8px 8px 0 var(--ink); overflow: hidden; position: relative;
+  background-color: var(--paper);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .36  0 0 0 0 .25  0 0 0 .09 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  display: flex; flex-direction: column }
+.status { height: 46px; padding: 14px 30px 0; display: flex; justify-content: space-between; font: 600 15px var(--f-py) }
+.nav { padding: 6px 22px 10px; display: flex; align-items: center; justify-content: space-between }
+.nav h2 { margin: 0; font: 26px/1.1 var(--f-cute) }
+.screen { flex: 1; padding: 4px 20px 0; display: flex; flex-direction: column; gap: 14px; overflow: hidden }
+.tabbar { height: 84px; border-top: 2.5px solid var(--ink); background: var(--card); display: grid; grid-template-columns: repeat(4, 1fr); padding: 8px 6px 22px }
+.tabbar div { display: grid; justify-items: center; gap: 2px; font: 12px var(--f-body); color: var(--sub) }
+.tabbar i { font: normal 22px/1 var(--f-cute) }
+.tabbar .on { color: var(--persimmon) } .tabbar .on i { background: var(--persimmon); color: #fff; border: 2px solid var(--ink); border-radius: 10px; padding: 2px 6px }
+
+.card { background: var(--card); border: 2.5px solid var(--ink); border-radius: 20px; box-shadow: 4px 4px 0 var(--ink) }
+.pill { display: inline-flex; align-items: center; gap: 4px; border: 2px solid var(--ink); border-radius: 99px; padding: 2px 10px; font: 13px var(--f-cute); background: var(--card) }
+.pill.m { background: var(--mustard) } .pill.s { background: var(--sage) } .pill.o { background: var(--persimmon); color: #fff } .pill.k { background: var(--sky) }
+.btn { border: 2.5px solid var(--ink); border-radius: 16px; box-shadow: 3px 3px 0 var(--ink); background: var(--persimmon); color: #fff; font: 18px var(--f-cute); padding: 10px 16px; display: inline-flex; align-items: center; justify-content: center; gap: 6px }
+.btn.w { background: var(--card); color: var(--ink) } .btn.y { background: var(--mustard); color: var(--ink) }
+.py { font: 500 13px var(--f-py); color: var(--sub) }
+.hint { font-size: 12.5px; color: var(--sub) }
+.seal { display: inline-grid; place-items: center; width: 38px; height: 38px; background: var(--cinnabar); color: var(--card); border-radius: 7px; font: 24px var(--f-brush); transform: rotate(-6deg); box-shadow: inset 0 0 0 2.5px var(--cinnabar), inset 0 0 0 4px rgba(255,249,239,.7) }
+.spark { position: absolute; color: var(--persimmon); font: 22px var(--f-py) }
+.bubble { position: relative; background: var(--card); border: 2px solid var(--ink); border-radius: 14px; padding: 6px 12px; font: 14px var(--f-cute) }
+.bubble::after { content: ""; position: absolute; left: -9px; top: 14px; width: 12px; height: 12px; background: var(--card); border-left: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: rotate(45deg) }
+
+/* 田字格 */
+.tzg { width: 96px; height: 96px; background: var(--card); border: 2.5px solid var(--cinnabar); border-radius: 6px; position: relative; display: grid; place-items: center; font: 70px/1 var(--f-brush) }
+.tzg::before, .tzg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(var(--cinnabar), var(--cinnabar)) center / 100% 1px no-repeat, linear-gradient(var(--cinnabar), var(--cinnabar)) center / 1px 100% no-repeat; opacity: .55 }
+.tzg::after { background: linear-gradient(45deg, transparent calc(50% - .5px), var(--cinnabar) 50%, transparent calc(50% + .5px)), linear-gradient(-45deg, transparent calc(50% - .5px), var(--cinnabar) 50%, transparent calc(50% + .5px)); opacity: .25 }
+.tzg span { position: relative; z-index: 1 }
+.tzg .ghost { color: #E3D8C6 }
+.tzg .part { position: absolute; z-index: 2; color: var(--ink); clip-path: inset(0 52% 0 0) }
+
+/* 首页 */
+.hero { padding: 16px; display: grid; grid-template-columns: 1fr 110px; gap: 10px; position: relative }
+.hero h3 { margin: 6px 0 2px; font: 22px var(--f-cute) }
+.today { display: flex; gap: 12px; align-items: center; margin-top: 10px }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+.tile { padding: 12px 14px; display: grid; gap: 4px; min-height: 112px; position: relative }
+.tile .big { font: 22px var(--f-cute) } .tile .em { font-size: 36px; position: absolute; right: 12px; bottom: 10px }
+.tile.photo { grid-column: span 2; background: var(--persimmon); color: #fff; min-height: 100px }
+.tile.photo .hint { color: #FFE7D6 }
+.tile.fam { background: var(--mustard) } .tile.rev { background: var(--sage) }
+.streak { padding: 12px 14px; display: flex; align-items: center; justify-content: space-between }
+.dots { display: flex; gap: 6px } .dots i { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font: normal 12px var(--f-cute); background: var(--card) }
+.dots i.f { background: var(--persimmon); color: #fff }
+
+/* 拍照 */
+.photo-wrap { position: relative; border: 2.5px solid var(--ink); border-radius: 22px; overflow: hidden; box-shadow: 4px 4px 0 var(--ink) }
+.photo-wrap img { width: 100%; display: block }
+.stk { position: absolute; transform: translate(-50%, -100%) rotate(var(--r, -3deg)); background: var(--card); border: 2px solid var(--ink); border-radius: 12px; padding: 1px 8px 3px; text-align: center; box-shadow: 2px 2px 0 var(--ink); white-space: nowrap }
+.stk b { display: block; font: 14px/1.15 var(--f-brush) } .stk small { font: 500 8.5px var(--f-py); color: var(--sub) } .stk { padding: 0 6px 2px; border-radius: 9px }
+.stk.on { background: var(--persimmon); color: #fff } .stk.on small { color: #FFE7D6 }
+.found { padding: 12px 14px; display: grid; gap: 10px }
+.chips { display: flex; flex-wrap: wrap; gap: 7px } .chips .pill { font: 15px var(--f-brush) }
+.scanbar { display: flex; align-items: center; gap: 10px }
+.shutter { width: 66px; height: 66px; border-radius: 50%; border: 3px solid var(--ink); background: var(--persimmon); box-shadow: 3px 3px 0 var(--ink), inset 0 0 0 5px var(--card); display: grid; place-items: center; font-size: 24px }
+
+/* 学习卡 */
+.word-hd { padding: 16px; display: flex; justify-content: space-between; align-items: center }
+.word-hd .zh { font: 46px/1 var(--f-brush) } .word-hd .zh em { font-style: normal; color: var(--cinnabar) }
+.word-hd .p { font: 600 18px var(--f-py); color: var(--persimmon) } .word-hd .e { font: italic 14px var(--f-py); color: var(--sub) }
+.grids { display: flex; gap: 10px; justify-content: center }
+.steps { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap }
+.steps i { width: 30px; height: 30px; border: 1.5px solid var(--ink); border-radius: 6px; background: var(--card); display: grid; place-items: center; font: normal 20px var(--f-brush); color: var(--ink) }
+.sent { padding: 14px; font: 18px/1.9 var(--f-brush) } .sent mark { background: var(--mustard); border-radius: 6px; padding: 0 4px; color: var(--ink) }
+.actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px } .actions .btn { font-size: 16px; padding: 10px 4px; flex-direction: column; gap: 2px } .actions .btn span { font-size: 22px }
+
+/* 故事 */
+.book { padding: 16px 16px 14px; position: relative; background: var(--card) repeating-linear-gradient(transparent 0 37px, rgba(200,69,47,.12) 37px 38px) }
+.book h3 { margin: 0; font: 24px var(--f-cute) } .book .en { font: italic 12.5px var(--f-py); color: var(--sub) }
+.line { font: 19px/2.5 var(--f-brush); padding-left: 10px; border-left: 4px solid transparent }
+.line.now { border-left-color: var(--cinnabar); background: rgba(242,184,75,.22); border-radius: 0 8px 8px 0 }
+.w { background: var(--mustard); border-bottom: 2.5px solid var(--ink); border-radius: 6px 6px 2px 2px; padding: 0 3px; margin: 0 1px; ruby-position: over }
+.w rt { font: 500 10px var(--f-py); color: var(--sub); letter-spacing: 0 }
+.player { padding: 10px 12px; display: flex; align-items: center; gap: 10px }
+.play { width: 46px; height: 46px; border-radius: 50%; background: var(--persimmon); border: 2.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); color: #fff; display: grid; place-items: center; font-size: 18px }
+.track { flex: 1; height: 12px; border: 2px solid var(--ink); border-radius: 99px; background: var(--card); position: relative; overflow: hidden }
+.track i { position: absolute; inset: 0 55% 0 0; background: repeating-linear-gradient(90deg, var(--persimmon) 0 10px, var(--mustard) 10px 20px) }
+
+/* 复习 */
+.prog { display: flex; gap: 5px } .prog i { flex: 1; height: 10px; border: 1.5px solid var(--ink); border-radius: 99px; background: var(--card) } .prog i.f { background: var(--sage) } .prog i.n { background: var(--persimmon) }
+.quiz { padding: 18px 16px; display: grid; justify-items: center; gap: 14px }
+.pic { width: 168px; height: 168px; border: 2.5px solid var(--ink); border-radius: 22px; overflow: hidden; background: #EAF1F4; box-shadow: 3px 3px 0 var(--ink); transform: rotate(-2deg) }
+.pic img { width: 100%; height: 100%; object-fit: cover }
+.opts { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+.opt { border: 2.5px solid var(--ink); border-radius: 16px; background: var(--card); box-shadow: 3px 3px 0 var(--ink); padding: 10px 0 8px; text-align: center; font: 30px/1.1 var(--f-brush) }
+.opt small { display: block; font: 500 11px var(--f-py); color: var(--sub) }
+.opt.ok { background: var(--sage) } .opt.no { background: #F6D2C6; opacity: .75 }
+.cal { padding: 12px 14px; display: grid; gap: 8px }
+.cal .row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; font: 12px var(--f-body); color: var(--sub) }
+.cal .row b { font: 14px var(--f-cute); color: var(--ink); height: 32px; border-radius: 10px; display: grid; place-items: center; border: 1.5px dashed #CDBFA8 }
+.cal .row b.d { background: var(--persimmon); color: #fff; border: 2px solid var(--ink) } .cal .row b.t { background: var(--mustard); border: 2px solid var(--ink) }
+
+/* 字族 */
+.poster { border: 2.5px solid var(--ink); border-radius: 18px; overflow: hidden; box-shadow: 4px 4px 0 var(--ink); background: var(--card) }
+.poster canvas { width: 100%; display: block }
+.fam-ctl { display: flex; gap: 8px; align-items: center }
+.charin { width: 62px; height: 62px; border: 2.5px solid var(--ink); border-radius: 16px; background: var(--card); font: 42px/58px var(--f-brush); text-align: center; box-shadow: 3px 3px 0 var(--ink) }
+.mini-chips { display: flex; gap: 6px; flex-wrap: wrap } .mini-chips span { width: 34px; height: 34px; border: 2px solid var(--ink); border-radius: 10px; background: var(--card); display: grid; place-items: center; font: 20px var(--f-brush) }
+.mini-chips span.on { background: var(--persimmon); color: #fff }
+.qc { padding: 10px 12px; display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; font-size: 13px }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <!-- 吉祥物：围红围巾的小鹿「鹿鹿」 -->
+  <symbol id="deer" viewBox="0 0 120 130">
+    <g stroke="#2B2420" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M40 30 C36 18 30 14 26 8 M36 22 L29 20 M80 30 C84 18 90 14 94 8 M84 22 L91 20" fill="none"/>
+      <ellipse cx="26" cy="46" rx="15" ry="8" transform="rotate(-28 26 46)" fill="#D98C52"/>
+      <ellipse cx="94" cy="46" rx="15" ry="8" transform="rotate(28 94 46)" fill="#D98C52"/>
+      <ellipse cx="27" cy="46" rx="8" ry="3.5" transform="rotate(-28 27 46)" fill="#F7C7B5" stroke="none"/>
+      <ellipse cx="93" cy="46" rx="8" ry="3.5" transform="rotate(28 93 46)" fill="#F7C7B5" stroke="none"/>
+      <path d="M38 104 C30 116 34 126 60 126 C86 126 90 116 82 104 Z" fill="#D98C52"/>
+      <ellipse cx="60" cy="62" rx="34" ry="31" fill="#D98C52"/>
+      <ellipse cx="60" cy="78" rx="19" ry="13" fill="#FBE8D2"/>
+      <path d="M30 96 C46 106 74 106 90 96 L92 106 C74 114 46 114 28 106 Z" fill="#C8452F"/>
+      <path d="M72 106 L80 124 L70 122 L64 108 Z" fill="#C8452F"/>
+    </g>
+    <circle cx="48" cy="40" r="3" fill="#FBE8D2"/><circle cx="58" cy="35" r="2.4" fill="#FBE8D2"/><circle cx="70" cy="39" r="2.8" fill="#FBE8D2"/>
+    <circle cx="46" cy="62" r="5.5" fill="#2B2420"/><circle cx="74" cy="62" r="5.5" fill="#2B2420"/>
+    <circle cx="47.8" cy="60" r="1.9" fill="#fff"/><circle cx="75.8" cy="60" r="1.9" fill="#fff"/>
+    <ellipse cx="60" cy="73" rx="5" ry="3.6" fill="#2B2420"/>
+    <path d="M55 80 Q60 85 65 80" fill="none" stroke="#2B2420" stroke-width="2.4" stroke-linecap="round"/>
+    <ellipse cx="36" cy="74" rx="6" ry="3.6" fill="#F29C8F" opacity=".85"/><ellipse cx="84" cy="74" rx="6" ry="3.6" fill="#F29C8F" opacity=".85"/>
+    <g stroke="#2B2420" stroke-width="2" fill="none" opacity=".5"><path d="M40 108 l4 4 M50 110 l4 4 M84 108 l-4 4"/></g>
+  </symbol>
+</svg>
+
+<div class="board">
+  <div class="board-head">
+    <svg width="74" height="80"><use href="#deer"/></svg>
+    <div><h1>识字工坊 · 小程序 UI</h1><p>宣纸米底 · 墨线描边 · 柿子橙 · 朱砂印 —— 看到什么，就学会什么</p></div>
+  </div>
+
+  <div class="phones">
+    <!-- 1 首页 -->
+    <div><div class="cap"><b>1</b>首页</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>●●● 5G ▮</span></div>
+        <div class="nav"><h2>识字工坊</h2><span class="pill m">🔥 连续 6 天</span></div>
+        <div class="screen">
+          <div class="card hero">
+            <div>
+              <span class="pill o">今日一字</span>
+              <h3>早上好，小朋友！</h3>
+              <div class="hint">今天学会 3 个新字，再复习 5 个</div>
+              <div class="today"><div class="tzg" style="width:78px;height:78px;font-size:56px"><span>明</span></div>
+                <div><div class="py" style="font-size:16px;color:var(--persimmon)">míng</div><div class="hint">bright · 日 + 月</div><div style="margin-top:6px"><span class="pill">🔊 读一读</span></div></div></div>
+            </div>
+            <svg width="110" height="120" style="align-self:end"><use href="#deer"/></svg>
+            <span class="spark" style="right:14px;top:10px">✦</span>
+          </div>
+          <div class="tiles">
+            <div class="card tile photo"><div class="big">📷 拍一拍，认一认</div><div class="hint">拍冰箱、书桌、玩具筐，照片里的东西马上变成字</div><div class="em">🍎</div></div>
+            <div class="card tile fam"><div class="big">字族图</div><div class="hint" style="color:#6B5420">一个字带出 9 个词</div><div class="em" style="font:34px var(--f-brush)">小</div></div>
+            <div class="card tile rev"><div class="big">复习</div><div class="hint" style="color:#3F5236">5 个词等你</div><div class="em">🗓️</div></div>
+          </div>
+          <div class="card" style="padding:12px 14px;display:grid;gap:8px">
+            <div style="display:flex;justify-content:space-between"><span style="font:16px var(--f-cute)">最近拍的</span><span class="hint">全部 ›</span></div>
+            <div style="display:flex;gap:10px">
+              <div style="flex:1;border:2px solid var(--ink);border-radius:12px;background:#EAF1F4;padding:6px 8px"><div style="font-size:22px">🧊🍎🥕</div><div style="font:13px var(--f-cute)">冰箱里 · 10 个词</div></div>
+              <div style="flex:1;border:2px solid var(--ink);border-radius:12px;background:#F7E7CF;padding:6px 8px"><div style="font-size:22px">📚✏️🪑</div><div style="font:13px var(--f-cute)">书桌上 · 6 个词</div></div>
+            </div>
+          </div>
+          <div class="card streak"><div><div style="font:16px var(--f-cute)">本周</div><div class="hint">学了 23 个词</div></div>
+            <div class="dots"><i class="f">一</i><i class="f">二</i><i class="f">三</i><i class="f">四</i><i class="f">五</i><i class="f">六</i><i>日</i></div></div>
+        </div>
+        <div class="tabbar"><div class="on"><i>识</i>首页</div><div><i>拍</i>拍照</div><div><i>族</i>字族</div><div><i>习</i>复习</div></div>
+      </div>
+    </div>
+
+    <!-- 2 拍照识字 -->
+    <div><div class="cap"><b>2</b>拍照识字 · 识别结果</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>●●● 5G ▮</span></div>
+        <div class="nav"><h2>拍一拍</h2><span class="pill s">🧊 冰箱里</span></div>
+        <div class="screen">
+          <div class="photo-wrap" id="photoWrap"><img id="fridge" alt=""></div>
+          <div class="card found">
+            <div style="display:flex;justify-content:space-between;align-items:center"><div style="font:18px var(--f-cute)">找到 10 样东西 ✦</div><span class="hint">用时 3.2 秒</span></div>
+            <div class="chips"><span class="pill">苹果</span><span class="pill">橘子</span><span class="pill">葡萄</span><span class="pill">酸奶</span><span class="pill o">胡萝卜</span><span class="pill">鸡蛋</span><span class="pill">奶酪</span><span class="pill">番茄</span><span class="pill">牛奶</span><span class="pill">草莓</span></div>
+          </div>
+          <div class="scanbar"><div class="bubble" style="margin-left:72px;flex:1">点一点贴纸，听它怎么读～</div></div>
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <svg width="62" height="68"><use href="#deer"/></svg>
+            <div class="shutter">📷</div>
+            <div class="btn w" style="font-size:15px;padding:8px 12px">📖 小故事</div>
+          </div>
+        </div>
+        <div class="tabbar"><div><i>识</i>首页</div><div class="on"><i>拍</i>拍照</div><div><i>族</i>字族</div><div><i>习</i>复习</div></div>
+      </div>
+    </div>
+
+    <!-- 3 学习卡 -->
+    <div><div class="cap"><b>3</b>学一个词 · 读和写</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>●●● 5G ▮</span></div>
+        <div class="nav"><h2>‹ 胡萝卜</h2><span class="pill m">已加入复习</span></div>
+        <div class="screen">
+          <div class="card word-hd">
+            <div><div class="p">hú luó bo</div><div class="zh">胡<em>萝</em>卜</div><div class="e">carrot</div></div>
+            <div style="font-size:64px;transform:rotate(8deg)">🥕</div>
+          </div>
+          <div class="card" style="padding:16px 12px;display:grid;gap:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:17px var(--f-cute)">笔顺 · 萝 <span class="hint">第 5 / 11 笔</span></span><span class="seal">萝</span></div>
+            <div class="grids"><div class="tzg"><span>胡</span></div><div class="tzg"><span class="ghost">萝</span><span class="part">萝</span></div><div class="tzg"><span class="ghost">卜</span></div></div>
+            <div class="steps"><i>一</i><i>丨</i><i>丨</i><i>丨</i><i style="background:var(--persimmon);color:#fff">𠃍</i><i style="color:#CDBFA8">一</i><i style="color:#CDBFA8">丿</i><i style="color:#CDBFA8">㇇</i></div>
+          </div>
+          <div class="actions"><div class="btn"><span>🔊</span>读一读</div><div class="btn y"><span>✍️</span>跟着写</div><div class="btn w"><span>🔤</span>English</div></div>
+          <div class="card sent">小兔子爱吃<mark>胡萝卜</mark>。<div class="hint" style="font-family:var(--f-py);font-style:italic;line-height:1.4">Bunnies love carrots.</div></div>
+          <div style="display:flex;align-items:center;gap:10px"><svg width="58" height="64"><use href="#deer"/></svg><div class="bubble">「萝」是草字头，跟植物有关哦！</div></div>
+        </div>
+        <div class="tabbar"><div><i>识</i>首页</div><div class="on"><i>拍</i>拍照</div><div><i>族</i>字族</div><div><i>习</i>复习</div></div>
+      </div>
+    </div>
+
+    <!-- 4 小故事 -->
+    <div><div class="cap"><b>4</b>拍照小故事</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>●●● 5G ▮</span></div>
+        <div class="nav"><h2>小故事</h2><span class="pill k">换一个 ↻</span></div>
+        <div class="screen">
+          <div class="card book">
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px"><svg width="56" height="62"><use href="#deer"/></svg><div><h3>小鹿打开冰箱</h3><div class="en">Little Deer Opens the Fridge</div></div></div>
+            <div class="line">小鹿悄悄打开冰箱门。</div>
+            <div class="line">它先看见了<ruby class="w">苹果<rt>píng guǒ</rt></ruby>🍎，开心地跳起来。</div>
+            <div class="line now"><ruby class="w">橘子<rt>jú zi</rt></ruby>🍊眨眨眼睛说：“还有我呢！”</div>
+            <div class="line">小鹿轻轻抱起<ruby class="w">葡萄<rt>pú tao</rt></ruby>🍇，放进篮子。</div>
+            <div class="line">咦，<ruby class="w">酸奶<rt>suān nǎi</rt></ruby>🥛躲在最里面！</div>
+            <div class="line">你能找到<ruby class="w">苹果<rt>píng guǒ</rt></ruby>在哪里吗？</div>
+          </div>
+          <div class="card player"><div class="play">❚❚</div><div style="flex:1;display:grid;gap:6px"><div class="track"><i></i></div><div class="hint">第 3 句 / 共 6 句 · 中文</div></div><span class="pill">EN</span></div>
+          <div class="hint" style="text-align:center">点黄色的词，马上学怎么读、怎么写</div>
+        </div>
+        <div class="tabbar"><div><i>识</i>首页</div><div class="on"><i>拍</i>拍照</div><div><i>族</i>字族</div><div><i>习</i>复习</div></div>
+      </div>
+    </div>
+
+    <!-- 5 复习 -->
+    <div><div class="cap"><b>5</b>复习 · 看图选字</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>●●● 5G ▮</span></div>
+        <div class="nav"><h2>复习</h2><span class="pill o">还剩 3 个</span></div>
+        <div class="screen">
+          <div class="prog"><i class="f"></i><i class="f"></i><i class="n"></i><i></i><i></i></div>
+          <div class="card quiz">
+            <div class="pic"><img id="crop" alt=""></div>
+            <div style="font:22px var(--f-cute)">这是什么？ <span class="pill">🔊</span></div>
+            <div class="opts"><div class="opt">酸奶</div><div class="opt no">鸡蛋</div><div class="opt ok">苹果<small>píng guǒ ✓</small></div><div class="opt">牛奶</div></div>
+            <div class="hint">这张图来自你 11 月 3 日拍的冰箱</div>
+          </div>
+          <div class="card cal">
+            <div style="display:flex;justify-content:space-between"><span style="font:16px var(--f-cute)">复习日历</span><span class="hint">1 → 2 → 4 → 7 → 15 → 30 天</span></div>
+            <div class="row"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+            <div class="row"><b class="d">3</b><b class="d">4</b><b class="t">5</b><b>6</b><b>7</b><b>8</b><b>9</b></div>
+          </div>
+        </div>
+        <div class="tabbar"><div><i>识</i>首页</div><div><i>拍</i>拍照</div><div><i>族</i>字族</div><div class="on"><i>习</i>复习</div></div>
+      </div>
+    </div>
+
+    <!-- 6 字族图 -->
+    <div><div class="cap"><b>6</b>字族图生成</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>●●● 5G ▮</span></div>
+        <div class="nav"><h2>字族图</h2><span class="pill">⚙︎ 设置</span></div>
+        <div class="screen">
+          <div class="fam-ctl"><div class="charin">明</div><div class="mini-chips"><span>小</span><span>大</span><span class="on">明</span><span>山</span><span>水</span><span>火</span><span>花</span></div></div>
+          <div class="poster"><canvas id="poster"></canvas></div>
+          <div style="display:flex;gap:8px"><span class="pill o">3:4</span><span class="pill">1:1</span><span class="pill">16:9</span><span style="flex:1"></span><span class="pill m">柿子</span><span class="pill">宣纸</span></div>
+          <div class="card qc"><span>✅</span><span>质检 7 / 7 · 每个词都含「明」</span><span class="pill s">通过</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="btn w">复制提示词</div><div class="btn">保存到相册</div></div>
+        </div>
+        <div class="tabbar"><div><i>识</i>首页</div><div><i>拍</i>拍照</div><div class="on"><i>族</i>字族</div><div><i>习</i>复习</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../core/lexicon.js"></script>
+<script src="../core/render.js"></script>
+<script src="../core/demo.js"></script>
+<script>
+(async function () {
+  await document.fonts.ready;
+  await Promise.all(['ZCOOL KuaiLe', 'Ma Shan Zheng', 'Noto Sans SC'].map(f => document.fonts.load('20px "' + f + '"', '识字工坊明小大胡萝卜苹果')));
+  // 冰箱照片 + 贴纸标签
+  const c = document.createElement('canvas'); c.width = HZDemo.W; c.height = HZDemo.H; HZDemo.draw(c.getContext('2d'));
+  const url = c.toDataURL('image/jpeg', .9); document.getElementById('fridge').src = url;
+  const wrap = document.getElementById('photoWrap');
+  HZDemo.objects(HZLexicon).forEach((o, i) => {
+    const s = document.createElement('div'); s.className = 'stk' + (o.zh === '胡萝卜' ? ' on' : '');
+    s.style.left = (o.box[0] + o.box[2]) / 20 + '%'; s.style.top = Math.max(15, o.box[1] / 10 + 6) + '%'; s.style.setProperty('--r', ((i % 3) - 1) * 4 + 'deg');
+    s.innerHTML = '<b>' + o.zh + '</b><small>' + o.pinyin + '</small>'; wrap.appendChild(s);
+  });
+  // 复习题：从照片里裁出苹果
+  const k = document.createElement('canvas'); k.width = k.height = 300; const g = k.getContext('2d');
+  g.drawImage(c, 230 - 120, 205 - 115, 240, 240, 0, 0, 300, 300); document.getElementById('crop').src = k.toDataURL();
+  // 字族图：柿子主题
+  const p = document.getElementById('poster'); p.width = 1080; p.height = 1440;
+  HZRender.draw(p.getContext('2d'), HZLexicon.expand('明'), { width: 1080, height: 1440, theme: 'persimmon', brand: '识字工坊 · 每日一字',
+    fonts: { zh: '"Ma Shan Zheng", "KaiTi", serif', latin: '"Noto Sans", sans-serif' } });
+  document.body.dataset.ready = '1';
+})();
+</script>
+</body>
+</html>
